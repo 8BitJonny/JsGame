@@ -1,7 +1,10 @@
 import Game from "./game";
 
 let canvas = document.getElementById("game");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
 let ctx = canvas.getContext("2d");
+ctx.imageSmoothingEnabled = false;
 
 let GAME_WIDTH = 900;
 let GAME_HEIGHT = 600;

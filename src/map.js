@@ -2,10 +2,12 @@ import GameObject from "./gameObject";
 import Renderable from "./renderable";
 
 export default class Map extends GameObject {
-    constructor(mapJson, mapImage) {
+    constructor(mapJson, mapImage, totalSpriteCount, spriteInRow, spriteInColumn) {
         super(null, 0, 0);
 
-        this.renderable = new Renderable(mapImage,0,1,2,1,0);
+        this.SCALE = 2;
+
+        this.renderable = new Renderable(mapImage,this.SCALE,0,totalSpriteCount-1,spriteInRow,spriteInColumn,0);
         this.data = mapJson;
     }
 
@@ -21,8 +23,8 @@ export default class Map extends GameObject {
                 y = Math.floor(index/layer.width);
 
                 ctx.translate(
-                    this.position.x + x * this.renderable.frameWidth + 50,
-                    this.position.y + y * this.renderable.frameHeight + 50
+                    this.position.x + x * this.renderable.frameWidth * this.SCALE,
+                    this.position.y + y * this.renderable.frameHeight * this.SCALE
                 );
 
                 this.renderable.draw(ctx);

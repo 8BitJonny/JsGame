@@ -12,7 +12,7 @@ export default class Game {
 
     let character = new Player(Skeleton, 100, 100);
     let npc = [new Player(Skeleton, 100, 100)];
-    let map = new Map(MapData, MapImg);
+    let map = new Map(MapData, MapImg, 4, 4, 1);
 
     this.gameObjects = [map, ...npc, character];
 

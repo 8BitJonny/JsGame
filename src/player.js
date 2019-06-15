@@ -3,7 +3,8 @@ import Renderable from "./renderable";
 
 export default class Player extends GameObject {
   constructor(imageSprite, x, y) {
-    let baseRenderable = new Renderable(imageSprite, 18, 0, 9, 4, 10, true);
+    let SCALE = 1;
+    let baseRenderable = new Renderable(imageSprite, SCALE, 18, 0, 9, 4, 10, true);
     super(baseRenderable, x, y);
 
     this.facing = 0;
@@ -11,10 +12,10 @@ export default class Player extends GameObject {
 
     this.renderables = [
       baseRenderable,
-      new Renderable(imageSprite,  1, 7, 9, 4, 10, true),
-      new Renderable(imageSprite, 27, 7, 9, 4, 10, true),
-      new Renderable(imageSprite, 19, 7, 9, 4, 10, true),
-      new Renderable(imageSprite,  9, 7, 9, 4, 10, true)
+      new Renderable(imageSprite, SCALE, 1, 7, 9, 4, 10, true),
+      new Renderable(imageSprite, SCALE, 27, 7, 9, 4, 10, true),
+      new Renderable(imageSprite, SCALE, 19, 7, 9, 4, 10, true),
+      new Renderable(imageSprite, SCALE,  9, 7, 9, 4, 10, true)
     ]
   }
 

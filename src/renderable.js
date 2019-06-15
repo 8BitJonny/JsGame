@@ -3,6 +3,7 @@ import missingImg from "../images/imageNotFound.jpg";
 export default class Renderable {
   constructor(
     image = missingImg,
+    scale = 1,
     startFrame = 0,
     frameCount = 0,
     framesx = 1,
@@ -12,6 +13,7 @@ export default class Renderable {
   ) {
     this.img = new Image();
     this.img.src = image;
+    this.scale = scale;
 
     this.frame = startFrame;
     this.startFrame = startFrame;         //the frame of the sprite to start off with
@@ -55,8 +57,8 @@ export default class Renderable {
       this.frameHeight,
       0,
       0,
-      this.frameWidth,
-      this.frameHeight
+      this.frameWidth * this.scale,
+      this.frameHeight * this.scale
     );
   }
 }
