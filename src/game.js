@@ -1,18 +1,26 @@
 import Player from "./player";
 import InputHandler from "./inputHandler";
+import Map from "./map";
 import Skeleton from "../images/BODY_skeleton.png";
+import MapImg from "../images/tileset.png";
+import MapData from "../images/testmap.json";
 
 export default class Game {
   constructor(gameWidth, gameHeight) {
     this.width = gameWidth;
     this.height = gameHeight;
-    this.gameObjects = [new Player(Skeleton, 100, 100), new Player(Skeleton, 100, 100)];
 
-    this.input = new InputHandler(this.gameObjects[0], this);
+    let character = new Player(Skeleton, 100, 100);
+    let npc = [new Player(Skeleton, 100, 100)];
+    let map = new Map(MapData, MapImg);
+
+    this.gameObjects = [map, ...npc, character];
+
+    this.input = new InputHandler(character, this);
   }
 
   update(timePassed) {
-    this.input.handleInput()
+    this.input.handleInput();
 
     this.gameObjects.forEach(object => object.update(timePassed));
   }

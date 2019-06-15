@@ -1,7 +1,7 @@
 export default class InputHandler {
   constructor(player, game) {
     this.keysDown = [];
-    this.player = player
+    this.player = player;
 
     document.addEventListener("keydown", event => {
       //onKeyDown of movement keys -> add to list
@@ -25,7 +25,7 @@ export default class InputHandler {
           let index = this.keysDown.indexOf(event.code);
           if (index > -1) 
             this.keysDown.splice(index, 1);
-          if (this.keysDown.length == 0) 
+          if (this.keysDown.length === 0)
             this.player.stopMovement();
       }
     });
@@ -38,7 +38,7 @@ export default class InputHandler {
   handleInput() {
     // tell the player which keys are pressed and let him handle the movements
     if (this.keysDown.length > 0) {
-      this.player.translate(this.keysDown[0]);
+      this.player.translate(this.keysDown);
     }
   }
 }

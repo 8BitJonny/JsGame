@@ -3,7 +3,7 @@ export default class GameObject {
     this.position = { x: x, y: y };
     this.velocity = { x: 0, y: 0 };
 
-    this.renderModel = renderModel
+    this.renderModel = renderModel;
     this.childrenGameObjs = [];
   }
 
@@ -22,7 +22,8 @@ export default class GameObject {
     ctx.save();
     ctx.translate(this.position.x, this.position.y);
 
-    this.renderModel.draw(ctx)
+    if (this.renderModel)
+      this.renderModel.draw(ctx);
 
     this.childrenGameObjs.forEach(child => {
       child.renderModel.draw(ctx);

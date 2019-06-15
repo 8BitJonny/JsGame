@@ -7,7 +7,8 @@ export default class Renderable {
     frameCount = 0,
     framesx = 1,
     framesy = 1,
-    speed = 1
+    speed = 1,
+    animation = false
   ) {
     this.img = new Image();
     this.img.src = image;
@@ -26,12 +27,13 @@ export default class Renderable {
 
     // speed of animation and next timestamp when the frame should be changed
     this.speed = speed;
+    this.animation = animation;
     this.animTime = new Date().getTime();
   }
 
   draw(ctx) {
     let t = new Date().getTime();
-    if (t > this.animTime) {
+    if (t > this.animTime && this.animation) {
       this.frame++;
       this.animTime = t + 1000 / this.speed;
     }
