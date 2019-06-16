@@ -13,6 +13,7 @@ A fun little web based game written in plain Javascript.
 ## Authors
 
 * **Timon** - *Developer* - [8BitJonny](https://github.com/8BitJonny)
+* **Lewe** - *Developer* - [LeweC](https://github.com/LeweC)
 * **Fabinc** - *Designer*
 
 
