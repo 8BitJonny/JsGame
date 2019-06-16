@@ -7,13 +7,13 @@ export default class GameObject {
     this.childrenGameObjs = [];
   }
 
-  update(ctx) {
+  update() {
     // update the position of the obj and for all its children objects attached to it
     this.position.x += this.velocity.x;
     this.position.y += this.velocity.y;
 
     this.childrenGameObjs.forEach(child => {
-      child.update(ctx);
+      child.update();
     });
   }
 

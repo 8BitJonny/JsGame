@@ -8,7 +8,9 @@ export default class Renderable {
     frameCount = 0,
     framesx = 1,
     framesy = 1,
-    speed = 1,
+    xPadding = 0,
+    yPadding = 0,
+    speed = 0,
     animation = false
   ) {
     this.img = new Image();
@@ -23,9 +25,13 @@ export default class Renderable {
     this.framesx = framesx;
     this.framesy = framesy;
 
+    // How much pixels are between each frame for both axis
+    this.xPadding = xPadding;
+    this.yPadding = yPadding;
+
     // How wide and high a frame is in the sprite
-    this.frameWidth = this.img.width / this.framesx;
-    this.frameHeight = this.img.height / this.framesy;
+    this.frameWidth = (this.img.width - this.xPadding * (this.framesx - 1)) / this.framesx;
+    this.frameHeight = (this.img.height - this.yPadding * (this.framesy -1)) / this.framesy;
 
     // speed of animation and next timestamp when the frame should be changed
     this.speed = speed;
@@ -46,8 +52,8 @@ export default class Renderable {
     }
 
     // determine which x and y position the frame has in the sprite
-    let posx = (this.frame % this.framesx) * this.frameWidth;
-    let posy = Math.floor(this.frame / this.framesx) * this.frameHeight;
+    let posx = (this.frame % this.framesx) * this.frameWidth + (this.frame % this.framesx) * this.xPadding;
+    let posy = Math.floor(this.frame / this.framesx) * this.frameHeight + Math.floor(this.frame / this.framesx) * this.yPadding;
 
     ctx.drawImage(
       this.img,
