@@ -11,8 +11,15 @@ let GAME_HEIGHT = 600;
 
 let game = new Game(GAME_WIDTH, GAME_HEIGHT);
 let lastTime = 0;
+let firstStartup = true;
 
-function gameLoop(timestamp) {
+async function gameLoop(timestamp) {
+  if (firstStartup) {
+    drawLoading();
+    await sleep(1000);
+    firstStartup = false;
+  }
+
   let deltaTime = timestamp - lastTime;
   lastTime = timestamp;
 
@@ -25,3 +32,16 @@ function gameLoop(timestamp) {
 }
 
 requestAnimationFrame(gameLoop);
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function drawLoading() {
+  let x = canvas.width/2;
+  let y = canvas.height/2;
+  ctx.font = "30px Comic Sans MS";
+  ctx.fillStyle = "red";
+  ctx.textAlign = "center";
+  ctx.fillText("Loading", x, y);
+}
