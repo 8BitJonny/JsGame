@@ -31,13 +31,31 @@ export default class Game {
   }
 
   draw(ctx) {
-    this.gameObjects.forEach(object => object.draw(ctx));
+    if (this.loadingImages() == true) {
+      this.drawLoading(ctx);
+    } else {
+      this.gameObjects.forEach(object => object.draw(ctx));
 
-    if (this.DEBUG) {
-      this.collisionDetection.colliders.forEach(collider => {
-        collider.draw(ctx);
-      });
-      this.character.hitbox.draw(ctx);
+      if (this.DEBUG) {
+        this.collisionDetection.colliders.forEach(collider => {
+          collider.draw(ctx);
+        });
+        this.character.hitbox.draw(ctx);
+      }
     }
+  }
+
+  drawLoading(ctx) {
+    let x = this.width/2;
+    let y = this.height/2;
+    ctx.font = "30px Comic Sans MS";
+    ctx.fillStyle = "red";
+    ctx.textAlign = "center";
+    ctx.fillText("Loading", x, y);
+  }
+
+  //returns whether some images of the gameObjects are still being loaded
+  loadingImages() {
+    return this.gameObjects.filter(obj => {return obj.renderable.imageLoading == true}).length > 0
   }
 }

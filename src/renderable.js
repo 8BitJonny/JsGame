@@ -13,8 +13,14 @@ export default class Renderable {
     speed = 0,
     animation = false
   ) {
+    //indicates that the img is being loaded and not ready to draw
+    this.imageLoading = true;
+
     this.img = new Image();
     this.img.src = image;
+    this.img.addEventListener('load', async (obj) => {
+      this.imageLoading = false
+    }, false);
     this.scale = scale;
 
     this.frame = startFrame;

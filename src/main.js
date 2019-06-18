@@ -6,24 +6,16 @@ canvas.height = window.innerHeight;
 let ctx = canvas.getContext("2d");
 ctx.imageSmoothingEnabled = false;
 
-let GAME_WIDTH = 900;
-let GAME_HEIGHT = 600;
-
-let game = new Game(GAME_WIDTH, GAME_HEIGHT);
+let game = new Game(canvas.width, canvas.height);
 let lastTime = 0;
-let firstStartup = true;
 
-async function gameLoop(timestamp) {
-  if (firstStartup) {
-    drawLoading();
-    await sleep(1000);
-    firstStartup = false;
-  }
+checkIfLoadedAndReload();
 
+function gameLoop(timestamp) {
   let deltaTime = timestamp - lastTime;
   lastTime = timestamp;
 
-  ctx.clearRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   game.update(deltaTime);
   game.draw(ctx);
@@ -33,15 +25,28 @@ async function gameLoop(timestamp) {
 
 requestAnimationFrame(gameLoop);
 
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+//This method checks if the images have been already loaded. If not 
+//it waits for them to finish loading and reloads the page passing the paremeter on
+//that now the images have been loaded and the game can start
+function checkIfLoadedAndReload() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const myParam = urlParams.get('hasLoaded');
+
+  waitForLoading();
+
+  if(myParam != "true") {
+    location.replace(location.origin + '?hasLoaded=true');
+  }
 }
 
-function drawLoading() {
-  let x = canvas.width/2;
-  let y = canvas.height/2;
-  ctx.font = "30px Comic Sans MS";
-  ctx.fillStyle = "red";
-  ctx.textAlign = "center";
-  ctx.fillText("Loading", x, y);
+async function waitForLoading() {
+  if (game.loadingImages() == true) {
+    console.log("WAITING");
+    await sleep(100);
+    waitForLoading()
+  }
+}
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
 }

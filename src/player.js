@@ -8,16 +8,17 @@ export default class Player extends GameObject {
     let XPADDING = 34;
     let YPADDING = 10;
 
-    let baseRenderable = new Renderable(imageSprite, SCALE, 18, 0, 9, 4, XPADDING, YPADDING, 10, true);
-    super(baseRenderable, x, y);
+    let renderable = new Renderable(imageSprite, SCALE, 18, 0, 9, 4, XPADDING, YPADDING, 10, true);
+    super(renderable, x, y);
 
     this.facing = 0;
     this.speed = 1;
 
     this.collisionDetection = null;
 
+    this.renderable = renderable;
     this.renderables = [
-      baseRenderable,
+      renderable,
       new Renderable(imageSprite, SCALE,  1, 7, 9, 4, XPADDING, YPADDING, 10, true),
       new Renderable(imageSprite, SCALE, 27, 7, 9, 4, XPADDING, YPADDING, 10, true),
       new Renderable(imageSprite, SCALE, 19, 7, 9, 4, XPADDING, YPADDING, 10, true),
