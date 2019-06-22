@@ -1,10 +1,11 @@
 import Player from "./player";
 import InputHandler from "./inputHandler";
 import Map from "./map";
-import Skeleton from "../images/BODY_skeleton.png";
-import MapImg from "../images/tileset.png";
-import MapData from "../images/testmap.json";
+import Skeleton from "../ressources/images/BODY_skeleton.png";
+import MapImg from "../ressources/images/tileset.png";
+import MapData from "../ressources/map/testmap.json";
 import CollisionDetection from "./collisionDetection";
+import Networking from "./networking";
 
 export default class Game {
   constructor(gameWidth, gameHeight) {
@@ -12,9 +13,28 @@ export default class Game {
     this.width = gameWidth;
     this.height = gameHeight;
 
+    this.networking = new Networking('http://localhost:4004', (payload) => {
+      for (var playerId in payload.p) {
+        var serverPlayer = payload.p[playerId];
+        if (this.networking.socket.userid === playerId) {
+        } else {
+          if (this.onlinePlayer.hasOwnProperty(playerId)) {
+            var curPlayer = this.onlinePlayer[playerId];
+            curPlayer.position.x = serverPlayer.position.x;
+            curPlayer.position.y = serverPlayer.position.y;
+            curPlayer.facing = serverPlayer.facing;
+            curPlayer.renderModel = curPlayer.renderables[serverPlayer.facing];
+          } else {
+            this.onlinePlayer[playerId] = new Player(Skeleton, serverPlayer.position.x, serverPlayer.position.y)
+          }
+        }
+      };
+    });
+
     let map = new Map(MapData, MapImg, 4, 4, 1);
     this.character = new Player(Skeleton, 100, 100);
-    let npc = [new Player(Skeleton, 100, 100)];
+    this.onlinePlayer = {};
+    let npc = [];
 
     this.collisionDetection = new CollisionDetection([...map.colliders]);
     this.character.collisionDetection = this.collisionDetection;
@@ -28,6 +48,13 @@ export default class Game {
     this.input.handleInput();
 
     this.gameObjects.forEach(object => object.update(timePassed));
+    for (var playerId in this.onlinePlayer) {
+      if (this.onlinePlayer.hasOwnProperty(playerId)) {
+        this.onlinePlayer[playerId].update(timePassed)
+      };
+    };
+
+    this.networking.sendPosition(this.character);
   }
 
   draw(ctx) {
@@ -35,6 +62,12 @@ export default class Game {
       this.drawLoading(ctx);
     } else {
       this.gameObjects.forEach(object => object.draw(ctx));
+
+      for (var playerId in this.onlinePlayer) {
+        if (this.onlinePlayer.hasOwnProperty(playerId)) {
+          this.onlinePlayer[playerId].draw(ctx)
+        };
+      };
 
       if (this.DEBUG) {
         this.collisionDetection.colliders.forEach(collider => {

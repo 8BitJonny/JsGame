@@ -1,4 +1,4 @@
-import missingImg from "../images/imageNotFound.jpg";
+import missingImg from "../ressources/images/imageNotFound.jpg";
 
 export default class Renderable {
   constructor(
@@ -11,15 +11,22 @@ export default class Renderable {
     xPadding = 0,
     yPadding = 0,
     speed = 0,
-    animation = false
+    animation = false,
+    onLoadCallBack = () => {}
   ) {
     //indicates that the img is being loaded and not ready to draw
     this.imageLoading = true;
 
     this.img = new Image();
     this.img.src = image;
-    this.img.addEventListener('load', async (obj) => {
-      this.imageLoading = false
+
+    this.imgOnLoadCallback = onLoadCallBack;
+    this.img.addEventListener('load', (obj) => {
+      this.imageLoading = false;
+      this.frameWidth = (this.img.width - this.xPadding * (this.framesx - 1)) / this.framesx;
+      this.frameHeight = (this.img.height - this.yPadding * (this.framesy -1)) / this.framesy;
+      this.imgOnLoadCallback()
+
     }, false);
     this.scale = scale;
 
@@ -35,9 +42,9 @@ export default class Renderable {
     this.xPadding = xPadding;
     this.yPadding = yPadding;
 
-    // How wide and high a frame is in the sprite
-    this.frameWidth = (this.img.width - this.xPadding * (this.framesx - 1)) / this.framesx;
-    this.frameHeight = (this.img.height - this.yPadding * (this.framesy -1)) / this.framesy;
+    // How wide and high a frame is in the sprite. These values are beeing filled in the img onLoad Event Listener
+    this.frameWidth = 0
+    this.frameHeight = 0
 
     // speed of animation and next timestamp when the frame should be changed
     this.speed = speed;
