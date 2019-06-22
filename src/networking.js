@@ -34,7 +34,6 @@ export default class Networking {
     }
 
     sendPosition(character) {
-        console.log(character.facing);
         this.socket.emit("i", { x: character.position.x, y: character.position.y, f: character.facing})
     }
 }

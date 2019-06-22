@@ -13,7 +13,7 @@ export default class Game {
     this.width = gameWidth;
     this.height = gameHeight;
 
-    this.networking = new Networking('http://localhost:4004', (payload) => {
+    this.networking = new Networking('https://bga.timonchristiansen.com:4004', (payload) => {
       for (var playerId in payload.p) {
         var serverPlayer = payload.p[playerId];
         if (this.networking.socket.userid === playerId) {
