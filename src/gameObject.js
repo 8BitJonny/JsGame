@@ -1,43 +1,38 @@
+import Vector from "./vector";
+
 export default class GameObject {
-  constructor(renderModel, x, y) {
-    this.position = { x: x, y: y };
-    this.velocity = { x: 0, y: 0 };
+    constructor(spriteInterpreter, x, y) {
+        this.spriteInterpreter = spriteInterpreter;
+        this.position = new Vector(x,y);
+        this.velocity = new Vector(0,0);
 
-    this.renderModel = renderModel;
-    this.childrenGameObjs = [];
-  }
+        let shapeWidth = this.spriteInterpreter != null ? this.spriteInterpreter.shapeWidth : 0;
+        let shapeHeight = this.spriteInterpreter != null ? this.spriteInterpreter.shapeHeight : 0;
 
-  update() {
-    // update the position of the obj and for all its children objects attached to it
-    this.position.x += this.velocity.x;
-    this.position.y += this.velocity.y;
+        this.hitBox = {
+            width: shapeWidth,
+            height: shapeHeight 
+        };
 
-    this.childrenGameObjs.forEach(child => {
-      child.update();
-    });
-  }
+    };
 
-  draw(ctx) {
-    // draw the gameObj and all children objects attached to it
-    ctx.save();
-    ctx.translate(this.position.x, this.position.y);
+    draw(ctx) {
+        ctx.save();
+        ctx.translate(this.position.x, this.position.y);
 
-    if (this.renderModel)
-      this.renderModel.draw(ctx);
+        if(this.spriteInterpreter != null){
+            this.spriteInterpreter.draw(ctx);
+        };
 
-    this.childrenGameObjs.forEach(child => {
-      child.renderModel.draw(ctx);
-    });
-
-    ctx.restore();
-  }
-
-  addChild(obj) {
-    // attach a GameObject to this GameObject 
-    if (this.obj instanceof GameObject) {
-      this.children.push(obj);
-    } else {
-      console.error("Child can't be added. Is not of type GameObj")
-    }
-  }
-}
+        ctx.restore();
+    };
+    
+    update() {
+        this.position.add(this.velocity);
+    };
+    
+    drawDebug() {
+        ctx.strokeStyle = "red";
+        ctx.strokeRect(this.position.x,this.position.y,this.hitBox.width,this.hitBox.height);
+    };
+};

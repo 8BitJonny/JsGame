@@ -1,27 +1,33 @@
-import Box from "./box";
-
-export default class collisionDetection {
+export default class CollisionDetection {
     constructor(colliders) {
         this.colliders = colliders;
     }
 
-    addCollider(obj) {
-        if (obj instanceof Box) {
-            this.colliders.push(obj);
-        }
-    }
+    addCollidier(obj) {
+        if (obj instanceof GameObject) {
+            this.colliders.push(obj)
+        };
+    };
 
-    isColliding(hitBox) {
-        let isColliding = false;
+    isColliding(position, hitBox, velocity) {
+        let newPosition = position.copy();
+        newPosition.add(velocity);
+
         this.colliders.forEach(collider => {
-            if (hitBox.position.x <= collider.position.x + collider.size.width
-             && hitBox.position.x + hitBox.size.width >= collider.position.x
-             && hitBox.position.y <= collider.position.y + collider.size.height
-             && hitBox.position.y + hitBox.size.height >= collider.position.y) {
-                isColliding = true;
-            }
-        });
+            console.log("----");
+            console.log("NewPosition: ", newPosition);
+            console.log("Collider: ", collider);
+            console.log("Velocity: ", velocity);
+            if (newPosition.x <= collider.position.x + collider.hitBox.width
+             && newPosition.x + hitBox.width >= collider.hitBox.width) {
+                velocity.x = 0;
+            };
 
-        return isColliding
-    }
-}
+            if (newPosition.y <= collider.position.y + collider.hitBox.height
+             && newPosition.y + hitBox.height >= collider.position.y) {
+                 velocity.y = 0;
+             };
+        });
+        return velocity;
+    };
+};

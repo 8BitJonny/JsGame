@@ -1,104 +1,80 @@
 import GameObject from "./gameObject";
-import Renderable from "./renderable";
-import Box from "./box";
+import SpriteInterpreter from "./spriteInterpreter";
+import Vector from "./vector";
+import CollisionDetection from "./collisionDetection";
 
 export default class Player extends GameObject {
-  constructor(imageSprite, x, y) {
-    let SCALE = 1;
-    let XPADDING = 34;
-    let YPADDING = 10;
+    constructor(imgSprite,x,y){
+        let PADDINGX = 34;
+        let PADDINGY = 10;
+        let SCALE = 1;
+        let spriteInterpreter = new SpriteInterpreter(imgSprite, SCALE, 18, 0, 9, 4, PADDINGX, PADDINGY);
+        
+        super(spriteInterpreter, x, y);
+        this.SCALE = SCALE;
+        this.MAXSPEED = 1;
+        this.facingDirection = 0;
+        this.spriteInterpreterList = [
+            spriteInterpreter,
+            new SpriteInterpreter(imgSprite, this.SCALE,  1, 7, 9, 4, PADDINGX, PADDINGY, 10),
+            new SpriteInterpreter(imgSprite, this.SCALE, 27, 7, 9, 4, PADDINGX, PADDINGY, 10),
+            new SpriteInterpreter(imgSprite, this.SCALE, 19, 7, 9, 4, PADDINGX, PADDINGY, 10),
+            new SpriteInterpreter(imgSprite, this.SCALE,  9, 7, 9, 4, PADDINGX, PADDINGY, 10)
+        ];
 
-    let renderable = new Renderable(imageSprite, SCALE, 18, 0, 9, 4, XPADDING, YPADDING, 10, true, ()=>{this.hitbox = new Box(this.position, this.renderable.frameWidth, this.renderable.frameHeight)});
-    super(renderable, x, y);
+        this.collisionDetection = null;
+    };
 
-    this.facing = 0;
-    this.speed = 1;
+    update() {
+        if (this.collisionDetection != null) {
+            let newVelocity = this.collisionDetection.isColliding(this.position, this.hitBox, this.velocity);
+            this.velocity = newVelocity;
+        }
 
-    this.collisionDetection = null;
+        super.update();
+    };
 
-    this.renderable = renderable;
-    this.renderables = [
-      renderable,
-      new Renderable(imageSprite, SCALE,  1, 7, 9, 4, XPADDING, YPADDING, 10, true),
-      new Renderable(imageSprite, SCALE, 27, 7, 9, 4, XPADDING, YPADDING, 10, true),
-      new Renderable(imageSprite, SCALE, 19, 7, 9, 4, XPADDING, YPADDING, 10, true),
-      new Renderable(imageSprite, SCALE,  9, 7, 9, 4, XPADDING, YPADDING, 10, true)
-    ];
-    this.hitbox = new Box(this.position, this.frameWidth, this.frameHeight);
-  }
+    movePlayer(keysDown) {
+        var newVelocity = new Vector(0,0);
+        let oldFacingDirection = this.facingDirection;
 
-  update() {
-    if (this.collisionDetection != null) {
-      //check for Collision before updating position
-      let oldX = this.hitbox.position.x;
-      let oldY = this.hitbox.position.y;
+        // Change speed and faced direction according to keyboard input
+        if (keysDown.includes("KeyW") || keysDown.includes("ArrowUp")) {
+            newVelocity.y -= this.MAXSPEED;
+            this.facingDirection = 1;
+        }
 
-      //check if the hitbox of the next frame collides with something when only the xVelocity is added to the hitbox
-      this.hitbox.position.x += this.velocity.x;
-      let isCollidingX = this.collisionDetection.isColliding(this.hitbox);
+        if (keysDown.includes("KeyS") || keysDown.includes("ArrowDown")) {
+            newVelocity.y += this.MAXSPEED;
+            this.facingDirection = 3;
+        }
 
-      if (isCollidingX) {
-        // if it collides reset this the xVelocity
-        this.velocity.x = 0;
-      }
+        if (keysDown.includes("KeyA") || keysDown.includes("ArrowLeft")) {
+            newVelocity.x -= this.MAXSPEED;
+            this.facingDirection = 4;
+        }
 
-      //reset the hitbox to now check the yAxis
-      this.hitbox.position = {x: oldX,y: oldY};
+        if (keysDown.includes("KeyD") || keysDown.includes("ArrowRight")) {
+            newVelocity.x += this.MAXSPEED;
+            this.facingDirection = 2;
+        }
 
-      //check if the hitbox of the next frame collides with something when only the yVelocity is added to the hitbox
-      this.hitbox.position.y += this.velocity.y;
-      let isCollidingY = this.collisionDetection.isColliding(this.hitbox);
+        if (oldFacingDirection !== this.facingDirection) {
+            this.spriteInterpreter = this.spriteInterpreterList[this.facingDirection]
+        }
 
-      if (isCollidingY) {
-        // if it collides reset this the yVelocity
-        this.velocity.y = 0;
-      }
+        this.velocity = newVelocity;
+    };
 
-      //reset the hitbox and the position because through object reference the position variable changed too
-      this.hitbox.position = {x: oldX,y: oldY};
-      this.position = {x: oldX,y: oldY};
-    }
+    stopMovement() {
+        this.facingDirection = 0;
+        this.velocity = new Vector(0, 0);
+        this.spriteInterpreter = this.spriteInterpreterList[0];
+    };
 
-    super.update();
-
-    // update the hitbox to be according to the new position
-    this.hitbox.position = this.position;
-  }
-
-  translate(keysDown) {
-    var x = 0, y = 0;
-    let oldFacing = this.facing;
-
-    // Change speed and faced direction according to keyboard input
-    if (keysDown.includes("KeyW")) {
-      y -= this.speed*0.8;
-      this.facing = 1;
-    }
-    if (keysDown.includes("KeyS")) {
-      y += this.speed*0.8;
-      this.facing = 3;
-    }
-    if (keysDown.includes("KeyA")) {
-      x -= this.speed;
-      this.facing = 4;
-    }
-    if (keysDown.includes("KeyD")) {
-      x += this.speed;
-      this.facing = 2;
-    }
-
-    // Only update the current rendered Model if the player changed the faced direction
-    if (oldFacing !== this.facing)
-      this.renderModel = this.renderables[this.facing];
-
-    // Update position
-    this.velocity.x = x;
-    this.velocity.y = y;
-  }
-
-  stopMovement() {
-    this.facing = 0;
-    this.velocity = { x: 0, y: 0};
-    this.renderModel = this.renderables[0];
-  }
-}
+    setCollisionDetectionObject(object) {
+        if (object instanceof CollisionDetection) {
+            this.collisionDetection = object;
+        };
+    };
+};
