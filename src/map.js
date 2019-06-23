@@ -28,20 +28,19 @@ export default class Map {
                     this.colliders.push(newCollider);
                 })
             };
-        });    
-        console.log(this.colliders);
+        });
     };
     draw(ctx) {
         this.tileLayers.forEach(layer =>{
             let x = 0;
             let y = 0;
             layer.data.forEach((value, index) => {
-                ctx.save();
                 this.spriteinterpreter.currentShapeIndex = value - 1;
                 
                 x = index % layer.width;
                 y = Math.floor(index / layer.width);
                 
+                ctx.save();
                 ctx.translate(
                     x * this.spriteinterpreter.shapeWidth * this.SCALE,
                     y * this.spriteinterpreter.shapeHeight * this.SCALE

@@ -9,25 +9,17 @@ export default class CollisionDetection {
         };
     };
 
-    isColliding(position, hitBox, velocity) {
-        let newPosition = position.copy();
-        newPosition.add(velocity);
-
+    isColliding(position, hitBox) {
+        let isColliding = false;
         this.colliders.forEach(collider => {
-            console.log("----");
-            console.log("NewPosition: ", newPosition);
-            console.log("Collider: ", collider);
-            console.log("Velocity: ", velocity);
-            if (newPosition.x <= collider.position.x + collider.hitBox.width
-             && newPosition.x + hitBox.width >= collider.hitBox.width) {
-                velocity.x = 0;
-            };
-
-            if (newPosition.y <= collider.position.y + collider.hitBox.height
-             && newPosition.y + hitBox.height >= collider.position.y) {
-                 velocity.y = 0;
-             };
+            if (position.x <= collider.position.x + collider.hitBox.width
+             && position.x + hitBox.width >= collider.position.x
+             && position.y <= collider.position.y + collider.hitBox.height
+             && position.y + hitBox.height >= collider.position.y) {
+                isColliding = true;
+            }
         });
-        return velocity;
-    };
+
+        return isColliding
+    }
 };

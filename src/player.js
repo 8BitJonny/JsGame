@@ -12,7 +12,7 @@ export default class Player extends GameObject {
         
         super(spriteInterpreter, x, y);
         this.SCALE = SCALE;
-        this.MAXSPEED = 1;
+        this.MAXSPEED = 2;
         this.facingDirection = 0;
         this.spriteInterpreterList = [
             spriteInterpreter,
@@ -27,8 +27,32 @@ export default class Player extends GameObject {
 
     update() {
         if (this.collisionDetection != null) {
-            let newVelocity = this.collisionDetection.isColliding(this.position, this.hitBox, this.velocity);
-            this.velocity = newVelocity;
+            //check for Collision before updating position
+            let oldPosition = this.position.copy();
+
+            //check if the hitbox of the next frame collides with something when only the xVelocity is added to the hitbox
+            this.position.x += this.velocity.x;
+            let isCollidingX = this.collisionDetection.isColliding(this.position, this.hitBox);
+
+            if (isCollidingX) {
+                // if it collides reset this the xVelocity
+                this.velocity.x = 0;
+            }
+
+            //reset the hitbox to now check the yAxis
+            this.position = oldPosition.copy();
+
+            //check if the hitbox of the next frame collides with something when only the yVelocity is added to the hitbox
+            this.position.y += this.velocity.y;
+            let isCollidingY = this.collisionDetection.isColliding(this.position, this.hitBox);
+
+            if (isCollidingY) {
+                // if it collides reset this the yVelocity
+                this.velocity.y = 0;
+            }
+
+            //reset the hitbox and the position because through object reference the position variable changed too
+            this.position = oldPosition.copy();
         }
 
         super.update();
