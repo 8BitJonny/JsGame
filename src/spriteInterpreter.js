@@ -10,8 +10,7 @@ export default class SpriteInterpreter {
        paddingY = 0,
        speed = 0 
     ){
-       this.image = new Image();
-       this.image.src = image;
+       this.image = image;
        this.scale = scale;
        this.currentShapeIndex = startShapeIndex;
        this.startShapeIndex = startShapeIndex;

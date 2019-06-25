@@ -1,21 +1,6 @@
 import Game from "./game";
 
-const canvas = document.getElementById("game");
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+let game = new Game();
 
-const ctx = canvas.getContext("2d");
-ctx.imageSmoothingEnabled = false;
+game.start();
 
-let game = new Game(canvas.width, canvas.height);
-
-const gameLoop = () => {
-    ctx.clearRect(0,0,canvas.width, canvas.height);
-    
-    game.update();
-    game.draw(ctx);
-    
-    requestAnimationFrame(gameLoop);
-};
-
-gameLoop();
