@@ -3,7 +3,7 @@ import GameObject from "./gameObject";
 
 export default class Map {
     constructor(mapJson, mapImage, totalShapeCount, shapesInRow, shapesInColumn){
-        this.SCALE = 2;
+        this.SCALE = 4;
         this.spriteinterpreter = new SpriteInterpreter(
             mapImage,
             this.SCALE,
