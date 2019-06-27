@@ -1,14 +1,13 @@
-import UI from "./ui";
-import Map from "./map";
-import Player from "./player";
-import MapData from "../img/Testmap.json";
-import GameObject from "./gameObject";
-import Networking from "./networking";
-import AssetLoader from "./assetLoader";
-import InputHandler from "./inputHandler";
-import CollisionDetection from "./collisionDetection";
+const { UI } = require("./ui");
+const { Map } = require("./map");
+const { Player } = require("./player");
+const { GameObject } = require("./gameObject");
+const { Networking } = require("./networking");
+const { AssetLoader } = require("./assetLoader");
+const { InputHandler } = require("./inputHandler");
+const { CollisionDetection } = require("./collisionDetection");
 
-export default class Game {
+module.exports.Game = class Game {
     constructor() {
         this.ctxForeground = {};
         this.ctxBackground = {};
@@ -66,7 +65,7 @@ export default class Game {
     }
 
     initializeGameObjects() {
-        this.map = new Map(MapData, this.assetLoader.sprites["map1"], 240, 24, 10);
+        this.map = new Map(this.assetLoader.mapLayouts["mapLayout1"], this.assetLoader.sprites["map1"], 240, 24, 10);
         this.character = new Player(this.assetLoader.sprites["player1"], 100, 100);
 
         window.addEventListener("resize", _ => {

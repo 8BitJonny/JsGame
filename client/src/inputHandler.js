@@ -1,4 +1,4 @@
-export default class InputHandler{
+module.exports.InputHandler = class InputHandler{
     constructor(player, game){
         this.player = player;
         this.game = game;

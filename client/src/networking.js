@@ -1,4 +1,4 @@
-export default class Networking {
+module.exports.Networking = class Networking {
     constructor(ip,serverStateHandler) {
         this.socket = io.connect(ip);
         this.socket.on("onconnected", (payload) => {

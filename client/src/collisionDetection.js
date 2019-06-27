@@ -1,4 +1,4 @@
-export default class CollisionDetection {
+module.exports.CollisionDetection = class CollisionDetection {
     constructor(colliders) {
         this.colliders = colliders;
     }

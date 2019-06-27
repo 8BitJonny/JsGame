@@ -1,4 +1,4 @@
-export default class SpriteInterpreter {
+module.exports.SpriteInterpreter = class SpriteInterpreter {
     constructor(
        image,
        scale,

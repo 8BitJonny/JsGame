@@ -1,16 +1,20 @@
-import Player1 from "../img/BODY_skeleton.png";
-import Map1 from "../img/dungeon_sheet.png";
+const Map1 = require("../img/dungeon_sheet.png");
+const MapData = require("../img/Testmap.json");
+const Player1 = require("../img/BODY_skeleton.png");
 
-export default class AssetLoader {
+module.exports.AssetLoader = class AssetLoader {
     constructor() {
         this.imagesToBeLoaded = 0;
         this.startedLoading = false;
         this.sprites = {};
+        this.mapLayouts = {};
     }
 
     loadAssets() {
         this.sprites["player1"] = this._imageForPath(Player1);
         this.sprites["map1"] = this._imageForPath(Map1);
+
+        this.mapLayouts["mapLayout1"] = MapData;
         
         this.startedLoading = true;
     };

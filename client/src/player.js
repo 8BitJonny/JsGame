@@ -1,9 +1,9 @@
-import GameObject from "./gameObject";
-import SpriteInterpreter from "./spriteInterpreter";
-import Vector from "./vector";
-import CollisionDetection from "./collisionDetection";
+const { GameObject } = require("./gameObject");
+const { SpriteInterpreter } = require("./spriteInterpreter");
+const { Vector } = require("./vector");
+const { CollisionDetection } = require("./collisionDetection");
 
-export default class Player extends GameObject {
+module.exports.Player = class Player extends GameObject {
     constructor(imgSprite,x,y){
         let PADDINGX = 34;
         let PADDINGY = 10;

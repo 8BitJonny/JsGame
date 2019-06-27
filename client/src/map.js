@@ -1,7 +1,7 @@
-import SpriteInterpreter from "./spriteInterpreter";
-import GameObject from "./gameObject";
+const { SpriteInterpreter } = require("./spriteInterpreter");
+const { GameObject } = require("./gameObject");
 
-export default class Map {
+module.exports.Map = class Map {
     constructor(mapJson, mapImage, totalShapeCount, shapesInRow, shapesInColumn){
         this.SCALE = 2;
         this.spriteinterpreter = new SpriteInterpreter(

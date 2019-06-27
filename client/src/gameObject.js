@@ -1,6 +1,6 @@
-import Vector from "./vector";
+const { Vector } = require("./vector");
 
-export default class GameObject {
+module.exports.GameObject = class GameObject {
     constructor(spriteInterpreter, x, y) {
         this.spriteInterpreter = spriteInterpreter;
         this.position = new Vector(x,y);

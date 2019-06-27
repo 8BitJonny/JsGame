@@ -1,4 +1,4 @@
-export default class Vector {
+module.exports.Vector = class Vector {
     constructor(x,y) {
         this.x = x;
         this.y = y;
