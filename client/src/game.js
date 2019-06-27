@@ -81,70 +81,70 @@ module.exports.Game = class Game {
 
     draw() {
         this.map.drawForeground(this.ctxForeground);
-        for (var i = 0; i < this.objects.length; i++) {
+        for (let i = 0; i < this.objects.length; i++) {
             let object = this.objects[i];
             object.draw(this.ctxForeground);
-        };
+        }
         this.character.draw(this.ctxForeground);
         
-        for (var playerId in this.onlinePlayer) {
+        for (let playerId in this.onlinePlayer) {
             if (this.onlinePlayer.hasOwnProperty(playerId)) {
                 this.onlinePlayer[playerId].draw(this.ctxForeground)
-            };
-        };
+            }
+        }
     };
     
     update() {
         this.inputHandler.handleInput();
-        for (var i = 0; i < this.objects.length; i++) {
+        for (let i = 0; i < this.objects.length; i++) {
             let object = this.objects[i];
             object.update();
-        };
+        }
         this.character.update();
 
         this.networking.sendPosition(this.character);
 
-        for (var playerId in this.onlinePlayer) {
+        for (let playerId in this.onlinePlayer) {
             if (this.onlinePlayer.hasOwnProperty(playerId)) {
               this.onlinePlayer[playerId].update()
-            };
-        };
+            }
+        }
     };
     
     connectToServer() {
-        this.networking = new Networking('https://bga.timonchristiansen.com', (payload) => {
+        this.networking = new Networking('http://localhost:4004', (payload) => {
             let updatedPlayer = [];
-            for (var playerId in payload.p) {
-                var serverPlayer = payload.p[playerId];
+            for (let playerId in payload.p) {
+                let serverPlayer = payload.p[playerId];
                 if (this.networking.socket.userid === playerId) {
                 
                 } else if (this.isValidNetworkObject(serverPlayer)) {
                     updatedPlayer.push(playerId);
                     if (this.onlinePlayer.hasOwnProperty(playerId)) {
-                        var curPlayer = this.onlinePlayer[playerId];
-                        curPlayer.position.x = serverPlayer.position.x;
-                        curPlayer.position.y = serverPlayer.position.y;
-                        curPlayer.facing = serverPlayer.facing;
-                        curPlayer.spriteInterpreter = curPlayer.spriteInterpreterList[serverPlayer.facing];
+                        let curPlayer = this.onlinePlayer[playerId];
+                        curPlayer.position.x = serverPlayer.p.x;
+                        curPlayer.position.y = serverPlayer.p.y;
+                        curPlayer.facing = serverPlayer.f;
+                        curPlayer.spriteInterpreter = curPlayer.spriteInterpreterList[serverPlayer.f];
                     } else {
-                        this.onlinePlayer[playerId] = new Player(this.assetLoader.sprites["player1"], serverPlayer.position.x, serverPlayer.position.y)
-                    };
-                };
-            };
+                        this.onlinePlayer[playerId] = new Player(this.assetLoader.sprites["player1"], serverPlayer.p.x, serverPlayer.p.y)
+                    }
+                }
+            }
 
-            for (var playerId in this.onlinePlayer) {
-                if (this.onlinePlayer.hasOwnProperty(playerId)) {
-                    let index = updatedPlayer.indexOf(playerId);
+            for (let onlinePlayerId in this.onlinePlayer) {
+                if (this.onlinePlayer.hasOwnProperty(onlinePlayerId)) {
+                    let index = updatedPlayer.indexOf(onlinePlayerId);
                     
                     if(index === - 1){
-                        delete this.onlinePlayer[playerId];
-                    };
-                };
-            };
+                        delete this.onlinePlayer[onlinePlayerId];
+                    }
+                }
+            }
         });
     };
 
     isValidNetworkObject(obj) {
-        return obj.hasOwnProperty("facing") && obj.hasOwnProperty("position") && obj.hasOwnProperty("userid")
+        return obj.hasOwnProperty("f") && obj.hasOwnProperty("p");
     }
 };

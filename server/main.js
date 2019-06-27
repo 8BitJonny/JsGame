@@ -1,101 +1,24 @@
-class Game {
-    constructor() {
-        this.uuid = UUID();
-        this.players = {};
-        this.gameHandler = new GameHandler(this);
-    }
+const UUID = require("node-uuid");
+const Express = require("express");
+const SocketIO = require("socket.io");
+const CookieParser = require("cookie-parser");
 
-    update() {
-        this.gameHandler.update();
-    }
-}
-
-class Player {
-    constructor(userid) {
-        this.userid = userid;
-        this.position = new Vector(0,0);
-        this.facing = 0;
-    }
-}
-
-class Vector {
-    constructor(x,y) {
-        this.x = x;
-        this.y = y;
-    }
-}
-
-class GameHandler {
-    constructor(game) {
-        this.game = game;
-        this.lastState = {
-            players: game.players
-        };
-    }
-
-    update(deltaTime) {
-        this.lastState = {
-            p: this.game.players
-        };
-        io.emit("serverstate",this.lastState);
-        window.requestAnimationFrame(this.update.bind(this));
-    }
-
-    updatePlayer() {
-
-    }
-}
-
-
-const
-    gameport = process.env.PORT || 4004,
-    express = require("express"),
-    session = require("express-session"),
-    cookie = require("cookie"),
-    cookieParser = require("cookie-parser"),
-    sessionStore = new session.MemoryStore(),
-    UUID = require("node-uuid"),
-    verbose = false,
-    app = express();
+const { Server } = require("./server");
+const { Player } = require("../client/src/player");
 
 const COOKIE_SECRET = "secret";
-const COOKIE_NAME = "sid";
 
-global.window = global.document = global;
-frame_time = 10; //on server we run at 45ms, 22hz
+const app = Express();
+const gamePort = process.env.PORT || 4004;
 
-var vendors = [ 'ms', 'moz', 'webkit', 'o' ];
+app.use(CookieParser(COOKIE_SECRET));
 
-for ( var x = 0; x < vendors.length && !window.requestAnimationFrame; ++ x ) {
-    window.requestAnimationFrame = window[ vendors[ x ] + 'RequestAnimationFrame' ];
-    window.cancelAnimationFrame = window[ vendors[ x ] + 'CancelAnimationFrame' ] || window[ vendors[ x ] + 'CancelRequestAnimationFrame' ];
-}
+const expressInstance = app.listen(gamePort);
+console.log("Express: Listening on port " + gamePort);
 
-if ( !window.requestAnimationFrame ) {
-    window.requestAnimationFrame = function ( callback, element ) {
-        var currTime = Date.now(), timeToCall = Math.max( 0, frame_time - ( currTime - lastTime ) );
-        var id = window.setTimeout( function() { callback( currTime + timeToCall ); }, timeToCall );
-        lastTime = currTime + timeToCall;
-        return id;
-    };
-}
+const io = SocketIO(expressInstance);
 
-if ( !window.cancelAnimationFrame ) {
-    window.cancelAnimationFrame = function ( id ) { clearTimeout( id ); };
-}
-
-app.use(cookieParser(COOKIE_SECRET));
-
-const server = app.listen(gameport);
-console.log("Express: Listening on port " + gameport);
-
-const io = require('socket.io')(server);
-
-let
-    game = new Game(),
-    lastTime = 0;
-
-game.update(lastTime);
+let server = new Server(io);
 
 io.sockets.on('connection',
     // We are given a websocket object in our function
@@ -105,24 +28,25 @@ io.sockets.on('connection',
         console.log("We got a new client: ", client.userid);
 
         client.emit("onconnected", { id: client.userid });
+        server.switchPlayersLobby(client, null, "mainLobby");
 
-        game.players[client.userid] = new Player(client.userid);
+        io.to("mainLobby").emit("connectToRoom", { room: "mainLobby" });
 
+        // Upon receiving ping request from client, server sends ping back
         client.on("cp", (payload) => {
             client.emit("sp", payload);
         });
 
         client.on("i", (payload) => {
-            //console.log("Received new input: " + payload);
-            let player = game.players[client.userid];
-            player.position.x = payload.x;
-            player.position.y = payload.y;
-            player.facing = payload.f
+            server.handlePlayerInput(client.lobby, client.userid, payload);
         });
 
         client.on("disconnect", (payload) => {
-            console.log("client disconnected: " + client.userid);
-            delete game.players[client.userid];
+            console.log("client disconnected: ")
+            console.log(client.userid);
+            console.log(client.rooms);
+            console.log(payload);
+            server.switchPlayersLobby(client, client.lobby, null);
         });
 
     }

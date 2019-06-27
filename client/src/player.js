@@ -8,7 +8,7 @@ module.exports.Player = class Player extends GameObject {
         let PADDINGX = 34;
         let PADDINGY = 10;
         let SCALE = 1;
-        let spriteInterpreter = new SpriteInterpreter(imgSprite, SCALE, 18, 0, 9, 4, PADDINGX, PADDINGY);
+        let spriteInterpreter = imgSprite != null ? new SpriteInterpreter(imgSprite, SCALE, 18, 0, 9, 4, PADDINGX, PADDINGY) : null;
         
         super(spriteInterpreter, x, y);
         this.SCALE = SCALE;
@@ -16,10 +16,10 @@ module.exports.Player = class Player extends GameObject {
         this.facingDirection = 0;
         this.spriteInterpreterList = [
             spriteInterpreter,
-            new SpriteInterpreter(imgSprite, this.SCALE,  1, 7, 9, 4, PADDINGX, PADDINGY, 10),
-            new SpriteInterpreter(imgSprite, this.SCALE, 27, 7, 9, 4, PADDINGX, PADDINGY, 10),
-            new SpriteInterpreter(imgSprite, this.SCALE, 19, 7, 9, 4, PADDINGX, PADDINGY, 10),
-            new SpriteInterpreter(imgSprite, this.SCALE,  9, 7, 9, 4, PADDINGX, PADDINGY, 10)
+            imgSprite != null ? new SpriteInterpreter(imgSprite, this.SCALE,  1, 7, 9, 4, PADDINGX, PADDINGY, 10) : null,
+            imgSprite != null ? new SpriteInterpreter(imgSprite, this.SCALE, 27, 7, 9, 4, PADDINGX, PADDINGY, 10) : null,
+            imgSprite != null ? new SpriteInterpreter(imgSprite, this.SCALE, 19, 7, 9, 4, PADDINGX, PADDINGY, 10) : null,
+            imgSprite != null ? new SpriteInterpreter(imgSprite, this.SCALE,  9, 7, 9, 4, PADDINGX, PADDINGY, 10) : null
         ];
 
         this.collisionDetection = null;
@@ -99,6 +99,16 @@ module.exports.Player = class Player extends GameObject {
     setCollisionDetectionObject(object) {
         if (object instanceof CollisionDetection) {
             this.collisionDetection = object;
-        };
+        }
     };
+
+    returnNetworkData() {
+        return {
+            p: {
+                x: this.position.x,
+                y: this.position.y
+            },
+            f: this.facingDirection
+        }
+    }
 };
