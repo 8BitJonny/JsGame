@@ -1,3 +1,5 @@
+const { CollisionDetection } = require("../client/src/collisionDetection");
+
 const frameTime = 10; //on server we run at 45ms, 22hz
 const vendors = [ 'ms', 'moz', 'webkit', 'o' ];
 let lastTime = 0;
@@ -25,6 +27,7 @@ module.exports.GameEngine = class {
     constructor(lobby) {
         this.lobby = lobby;
         this.lastState = {};
+        this.collisionDetection = new CollisionDetection(this.lobby.map.colliders);
 
         this.lastFrameTime = 0;
     }

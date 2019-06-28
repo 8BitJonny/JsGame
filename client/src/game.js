@@ -70,7 +70,7 @@ module.exports.Game = class Game {
     }
 
     initializeGameObjects() {
-        this.map = new Map(this.assetLoader.mapLayouts["mapLayout1"], this.assetLoader.sprites["map1"], 240, 24, 10);
+        this.map = new Map(this.assetLoader.mapLayouts["mainLobby"], this.assetLoader.sprites["mainLobby"], 240, 24, 10);
         this.character = new Player(this.assetLoader.sprites["player1"], 100, 100);
 
         window.addEventListener("resize", _ => {

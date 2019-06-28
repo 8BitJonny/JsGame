@@ -4,14 +4,14 @@ const { GameObject } = require("./gameObject");
 module.exports.Map = class Map {
     constructor(mapJson, mapImage, totalShapeCount, shapesInRow, shapesInColumn){
         this.SCALE = 2;
-        this.spriteinterpreter = new SpriteInterpreter(
+        this.spriteinterpreter = mapImage != null ? new SpriteInterpreter(
             mapImage,
             this.SCALE,
             0,
             totalShapeCount - 1,
             shapesInRow,
             shapesInColumn,
-        );
+        ) : null;
         this.backgroundLayers = [];
         this.foregroundLayers = [];
         this.colliders = [];
@@ -28,6 +28,10 @@ module.exports.Map = class Map {
     };
 
     draw(ctx, tileLayers) {
+        if (this.spriteinterpreter === null) {
+            return
+        }
+
         tileLayers.forEach(layer =>{
             let x = 0;
             let y = 0;
@@ -72,7 +76,7 @@ module.exports.Map = class Map {
                         this.colliders.push(newCollider);
                     });
                     break;
-            };
+            }
         });
     };
 };

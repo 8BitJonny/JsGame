@@ -1,7 +1,3 @@
-const Map1 = require("../img/dungeon_sheet.png");
-const MapData = require("../img/Testmap.json");
-const Player1 = require("../img/BODY_skeleton.png");
-
 module.exports.AssetLoader = class AssetLoader {
     constructor() {
         this.imagesToBeLoaded = 0;
@@ -10,12 +6,21 @@ module.exports.AssetLoader = class AssetLoader {
         this.mapLayouts = {};
     }
 
-    loadAssets() {
-        this.sprites["player1"] = this._imageForPath(Player1);
-        this.sprites["map1"] = this._imageForPath(Map1);
+    loadMapData() {
+        const MapData = require("../img/Testmap.json");
 
-        this.mapLayouts["mapLayout1"] = MapData;
-        
+        this.mapLayouts["mainLobby"] = MapData;
+    }
+
+    loadAssets() {
+        const Player1 = require("../img/BODY_skeleton.png");
+        const Map1 = require("../img/dungeon_sheet.png");
+
+        this.sprites["player1"] = this._imageForPath(Player1);
+        this.sprites["mainLobby"] = this._imageForPath(Map1);
+
+        this.loadMapData();
+
         this.startedLoading = true;
     };
 
