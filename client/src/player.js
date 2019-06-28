@@ -25,7 +25,7 @@ module.exports.Player = class Player extends GameObject {
         this.collisionDetection = null;
     };
 
-    update() {
+    update(timePassed) {
         if (this.collisionDetection != null) {
             //check for Collision before updating position
             let oldPosition = this.position.copy();
@@ -55,7 +55,7 @@ module.exports.Player = class Player extends GameObject {
             this.position = oldPosition.copy();
         }
 
-        super.update();
+        super.update(timePassed);
     };
 
     movePlayer(keysDown) {
@@ -85,6 +85,10 @@ module.exports.Player = class Player extends GameObject {
 
         if (oldFacingDirection !== this.facingDirection) {
             this.spriteInterpreter = this.spriteInterpreterList[this.facingDirection]
+        }
+
+        if (keysDown.length === 0) {
+            this.facingDirection = 0;
         }
 
         this.velocity = newVelocity;

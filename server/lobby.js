@@ -9,11 +9,7 @@ module.exports.Lobby = class Lobby {
         this.players = {};
         this.mapID = mapID;
         this.gameEngine = new GameEngine(this);
-        this.gameEngine.update();
-    }
-
-    update() {
-        this.gameEngine.update();
+        this.gameEngine.update(0);
     }
 
     // Send Message to all players in this lobby

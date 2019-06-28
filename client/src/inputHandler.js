@@ -15,8 +15,8 @@ module.exports.InputHandler = class InputHandler{
                 case "ArrowRight":
                     if(!this.keysDown.includes(event.code)){
                         this.keysDown.unshift(event.code);
-                    };
-            };
+                    }
+            }
         });
         document.addEventListener("keyup",event => {
             switch(event.code) {
@@ -32,17 +32,17 @@ module.exports.InputHandler = class InputHandler{
                     
                     if(index > - 1){
                         this.keysDown.splice(index, 1);
-                    };
+                    }
                     
                     if(this.keysDown.length === 0){
                         this.player.stopMovement();
-                    };
-            };
+                    }
+            }
         });
     };
     handleInput() {
         if(this.keysDown.length > 0){
             this.player.movePlayer(this.keysDown);
-        };
+        }
     };
 };

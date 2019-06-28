@@ -12,6 +12,8 @@ module.exports.Game = class Game {
         this.ctxForeground = {};
         this.ctxBackground = {};
 
+        this.lastFrameTime = 0;
+
         this.ui = new UI();
 
         this.map = {};
@@ -42,12 +44,15 @@ module.exports.Game = class Game {
         this.ctxBackground.imageSmoothingEnabled = false;
     }
 
-    gameLoop() {
+    gameLoop(time) {
+        let timeSinceLastFrame = (time - this.lastFrameTime)/16;     //how much time has passed since last drawn frame relative to our standard interval of 16 ms
+        this.lastFrameTime = time;
+
         this.ctxForeground.clearRect(0,0,this.ui.cfg.width, this.ui.cfg.height);
         
-        this.update();
+        this.update(timeSinceLastFrame);
         this.draw();
-        
+
         requestAnimationFrame(this.gameLoop.bind(this));
     }
 
@@ -60,7 +65,7 @@ module.exports.Game = class Game {
             this.initializeGameObjects();
             this.map.drawBackground(this.ctxBackground);
             this.connectToServer();
-            this.gameLoop();
+            this.gameLoop(0);
         }
     }
 
@@ -94,21 +99,22 @@ module.exports.Game = class Game {
         }
     };
     
-    update() {
+    update(timePassed) {
         this.inputHandler.handleInput();
+        this.networking.sendInput(this.inputHandler.keysDown);
+
         for (let i = 0; i < this.objects.length; i++) {
             let object = this.objects[i];
-            object.update();
+            object.update(timePassed);
         }
-        this.character.update();
 
-        this.networking.sendPosition(this.character);
+        this.character.update(timePassed);
 
-        for (let playerId in this.onlinePlayer) {
+        /*for (let playerId in this.onlinePlayer) {
             if (this.onlinePlayer.hasOwnProperty(playerId)) {
-              this.onlinePlayer[playerId].update()
+              this.onlinePlayer[playerId].update(timePassed)
             }
-        }
+        }*/
     };
     
     connectToServer() {
@@ -116,9 +122,7 @@ module.exports.Game = class Game {
             let updatedPlayer = [];
             for (let playerId in payload.p) {
                 let serverPlayer = payload.p[playerId];
-                if (this.networking.socket.userid === playerId) {
-                
-                } else if (this.isValidNetworkObject(serverPlayer)) {
+                if (this.isValidNetworkObject(serverPlayer)) {
                     updatedPlayer.push(playerId);
                     if (this.onlinePlayer.hasOwnProperty(playerId)) {
                         let curPlayer = this.onlinePlayer[playerId];

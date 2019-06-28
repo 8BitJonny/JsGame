@@ -25,25 +25,32 @@ module.exports.GameEngine = class {
     constructor(lobby) {
         this.lobby = lobby;
         this.lastState = {};
+
+        this.lastFrameTime = 0;
     }
 
     handlePlayerInput(playerID, payload) {
         let player = this.lobby.players[playerID];
-        player.position.x = payload.x;
-        player.position.y = payload.y;
-        player.facingDirection = payload.f;
+        player.movePlayer(payload.k);
     }
 
-    update(deltaTime) {
+    update(time) {
+        let timeSinceLastFrame = (time - this.lastFrameTime) / 16;     //how much time has passed since last drawn frame relative to our standard interval of 16 ms
+        this.lastFrameTime = time;
+
+        // Update Position based on current set velocity.
+        for (let playerID in this.lobby.players) {
+            if (this.lobby.players.hasOwnProperty(playerID)) {
+                this.lobby.players[playerID].update(timeSinceLastFrame);          // this player.update method also checks collision
+            }
+        }
+
+        // build new serverState
         this.lastState = {
             p: this.returnNetworkDataForAllPlayers()
         };
         this.lobby.broadcast("serverstate", this.lastState);
         window.requestAnimationFrame(this.update.bind(this));
-    }
-
-    updatePlayer() {
-
     }
 
     returnNetworkDataForAllPlayers() {

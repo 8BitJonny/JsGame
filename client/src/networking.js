@@ -36,7 +36,8 @@ module.exports.Networking = class Networking {
         }, 1000);
     }
 
-    sendPosition(character) {
-        this.socket.emit("i", { x: character.position.x, y: character.position.y, f: character.facingDirection})
+    // Sends the received input from the player to the server e.g. which keys he pressed to move or to do an action
+    sendInput(playerInput) {
+        this.socket.emit("i", { k: playerInput });
     }
-}
+};
