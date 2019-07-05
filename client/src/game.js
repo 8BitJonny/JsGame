@@ -18,14 +18,14 @@ export default class Game {
 
         this.camera = new Camera();
         this.map = {};
-        this.objects = [new GameObject()];
+        this.objects = [];
         this.character = {};
         this.onlinePlayer = {};
         this.networking = {};
         this.inputHandler = {};
         this.collisionDetection = {};
         this.assetLoader = new AssetLoader();
-        this.debugShow = true;
+        this.debugShow = false;
 
     };
     
@@ -137,7 +137,7 @@ export default class Game {
               this.onlinePlayer[playerId].update()
             };
         };
-        this.camera.move(this.character);
+        this.camera.moveToKeepObjectFocused(this.character);
     };
     
     connectToServer() {
