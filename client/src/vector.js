@@ -9,12 +9,10 @@ export default class Vector {
     };
 
     add(otherVector) {
-        this.x += otherVector.x;
-        this.y += otherVector.y;
+        return new Vector(this.x + otherVector.x, this.y + otherVector.y);
     };
 
     sub(otherVector) {
-        this.x -= otherVector.x;
-        this.y -= otherVector.y;
+        return new Vector(this.x - otherVector.x, this.y - otherVector.y);
     };
 };

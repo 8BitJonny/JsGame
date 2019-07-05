@@ -28,10 +28,10 @@ export default class GameObject {
     };
     
     update() {
-        this.position.add(this.velocity);
+        this.position = this.position.add(this.velocity);
     };
     
-    drawDebug() {
+    drawDebug(ctx) {
         ctx.strokeStyle = "red";
         ctx.strokeRect(this.position.x,this.position.y,this.hitBox.width,this.hitBox.height);
     };

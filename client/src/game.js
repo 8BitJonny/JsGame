@@ -7,6 +7,7 @@ import Networking from "./networking";
 import AssetLoader from "./assetLoader";
 import InputHandler from "./inputHandler";
 import CollisionDetection from "./collisionDetection";
+import Camera from "./camera";
 
 export default class Game {
     constructor() {
@@ -15,6 +16,7 @@ export default class Game {
 
         this.ui = new UI();
 
+        this.camera = new Camera();
         this.map = {};
         this.objects = [];
         this.character = {};
@@ -23,8 +25,10 @@ export default class Game {
         this.inputHandler = {};
         this.collisionDetection = {};
         this.assetLoader = new AssetLoader();
-    };
+        this.debugShow = false;
 
+    };
+    
     start() {
         this.setupCanvas();
 
@@ -45,7 +49,8 @@ export default class Game {
 
     gameLoop() {
         this.ctxForeground.clearRect(0,0,this.ui.cfg.width, this.ui.cfg.height);
-        
+        this.ctxBackground.clearRect(0,0,this.ui.cfg.width, this.ui.cfg.height);
+
         this.update();
         this.draw();
         
@@ -81,18 +86,40 @@ export default class Game {
     }
 
     draw() {
+        this.ctxBackground.save();
+        this.ctxForeground.save();
+        
+        this.ctxBackground.translate(this.camera.position.x, this.camera.position.y);
+        this.ctxForeground.translate(this.camera.position.x, this.camera.position.y);
+
         this.map.drawForeground(this.ctxForeground);
+        this.map.drawBackground(this.ctxBackground);
+        
         for (var i = 0; i < this.objects.length; i++) {
             let object = this.objects[i];
             object.draw(this.ctxForeground);
         };
         this.character.draw(this.ctxForeground);
         
+        if(this.debugShow === true){
+            for (var i = 0; i < this.collisionDetection.colliders.length; i++) {
+                let object = this.collisionDetection.colliders[i];
+                console.log(this.collisionDetection.colliders);
+                object.drawDebug(this.ctxForeground);
+
+            }; 
+            this.character.drawDebug(this.ctxForeground);
+        };
+
         for (var playerId in this.onlinePlayer) {
             if (this.onlinePlayer.hasOwnProperty(playerId)) {
                 this.onlinePlayer[playerId].draw(this.ctxForeground)
             };
         };
+        this.ctxBackground.restore();
+        this.ctxForeground.restore();
+
+        
     };
     
     update() {
@@ -110,6 +137,7 @@ export default class Game {
               this.onlinePlayer[playerId].update()
             };
         };
+        this.camera.moveToKeepObjectFocused(this.character);
     };
     
     connectToServer() {
@@ -147,5 +175,5 @@ export default class Game {
 
     isValidNetworkObject(obj) {
         return obj.hasOwnProperty("facing") && obj.hasOwnProperty("position") && obj.hasOwnProperty("userid")
-    }
+    };
 };
