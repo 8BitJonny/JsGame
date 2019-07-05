@@ -1,0 +1,25 @@
+{
+  "name": "pago",
+  "version": "1.0.0",
+  "description": "A fun little web based game written in plain Javascript.",
+  "main": "index.js",
+  "scripts": {
+    "start_server": "cd server && npm run start",
+    "start_client": "cd client && npm run start",
+    "build_client": "cd client && npm run build",
+    "start": "concurrently \"npm run start_server\" \"npm run start_client\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/8BitJonny/JsGame.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/8BitJonny/JsGame/issues"
+  },
+  "homepage": "https://github.com/8BitJonny/JsGame#readme",
+  "dependencies": {
+    "concurrently": "^4.1.1"
+  }
+}
