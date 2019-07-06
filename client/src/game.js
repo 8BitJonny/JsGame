@@ -1,7 +1,6 @@
 const { UI } = require("./ui");
 const { Map } = require("./map");
 const { Player } = require("./player");
-const { GameObject } = require("./gameObject");
 const { Networking } = require("./networking");
 const { AssetLoader } = require("./assetLoader");
 const { InputHandler } = require("./inputHandler");
@@ -73,7 +72,7 @@ module.exports.Game = class Game {
         this.map = new Map(this.assetLoader.mapLayouts["mainLobby"], this.assetLoader.sprites["mainLobby"], 240, 24, 10);
         this.character = new Player(this.assetLoader.sprites["player1"], 100, 100);
 
-        window.addEventListener("resize", _ => {
+        window.addEventListener("resize", () => {
             this.ctxForeground.imageSmoothingEnabled = false;
             this.ctxBackground.imageSmoothingEnabled = false;
             this.map.drawBackground(this.ctxBackground);
@@ -101,13 +100,16 @@ module.exports.Game = class Game {
     
     update(timePassed) {
         this.inputHandler.handleInput();
-        this.networking.sendInput(this.inputHandler.keysDown);
+        this.networking.sendInput(this.inputHandler.prepareAndReturnInputStateForServer());
 
         for (let i = 0; i < this.objects.length; i++) {
             let object = this.objects[i];
             object.update(timePassed);
         }
 
+        // Do client side prediction
+        // While we wait on the server response we calculate the next character position on our own
+        // Upon receiving server confirmation, we then update the character positions accordingly
         this.character.update(timePassed);
 
         /*for (let playerId in this.onlinePlayer) {
@@ -118,37 +120,6 @@ module.exports.Game = class Game {
     };
     
     connectToServer() {
-        this.networking = new Networking('http://localhost:4004', (payload) => {
-            let updatedPlayer = [];
-            for (let playerId in payload.p) {
-                let serverPlayer = payload.p[playerId];
-                if (this.isValidNetworkObject(serverPlayer)) {
-                    updatedPlayer.push(playerId);
-                    if (this.onlinePlayer.hasOwnProperty(playerId)) {
-                        let curPlayer = this.onlinePlayer[playerId];
-                        curPlayer.position.x = serverPlayer.p.x;
-                        curPlayer.position.y = serverPlayer.p.y;
-                        curPlayer.facing = serverPlayer.f;
-                        curPlayer.spriteInterpreter = curPlayer.spriteInterpreterList[serverPlayer.f];
-                    } else {
-                        this.onlinePlayer[playerId] = new Player(this.assetLoader.sprites["player1"], serverPlayer.p.x, serverPlayer.p.y)
-                    }
-                }
-            }
-
-            for (let onlinePlayerId in this.onlinePlayer) {
-                if (this.onlinePlayer.hasOwnProperty(onlinePlayerId)) {
-                    let index = updatedPlayer.indexOf(onlinePlayerId);
-                    
-                    if(index === - 1){
-                        delete this.onlinePlayer[onlinePlayerId];
-                    }
-                }
-            }
-        });
+        this.networking = new Networking('http://localhost:4004', this);
     };
-
-    isValidNetworkObject(obj) {
-        return obj.hasOwnProperty("f") && obj.hasOwnProperty("p");
-    }
 };

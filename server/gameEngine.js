@@ -11,7 +11,7 @@ for ( let x = 0; x < vendors.length && !window.requestAnimationFrame; ++ x ) {
 }
 
 if ( !window.requestAnimationFrame ) {
-    window.requestAnimationFrame = function ( callback, element ) {
+    window.requestAnimationFrame = function ( callback ) {
         var currTime = Date.now(), timeToCall = Math.max( 0, frameTime - ( currTime - lastTime ) );
         var id = window.setTimeout( function() { callback( currTime + timeToCall ); }, timeToCall );
         lastTime = currTime + timeToCall;
@@ -34,7 +34,11 @@ module.exports.GameEngine = class {
 
     handlePlayerInput(playerID, payload) {
         let player = this.lobby.players[playerID];
-        player.movePlayer(payload.k);
+        player.inputHistory.push({
+            stateIndex: payload.si,
+            keysDown: payload.k
+        });
+        player.updateVelocity();
     }
 
     update(time) {

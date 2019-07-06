@@ -4,7 +4,6 @@ const SocketIO = require("socket.io");
 const CookieParser = require("cookie-parser");
 
 const { Server } = require("./server");
-const { Player } = require("../client/src/player");
 
 const COOKIE_SECRET = "secret";
 
@@ -25,7 +24,7 @@ io.sockets.on('connection',
     function(client) {
 
         client.userid = UUID();
-        console.log("We got a new client: ", client.userid);
+        console.log("[CON] We got a new client: ", client.userid.slice(0,5));
 
         client.emit("onconnected", { id: client.userid });
         server.switchPlayersLobby(client, null, "mainLobby");
@@ -41,11 +40,8 @@ io.sockets.on('connection',
             server.handlePlayerInput(client.lobby, client.userid, payload);
         });
 
-        client.on("disconnect", (payload) => {
-            console.log("client disconnected: ")
-            console.log(client.userid);
-            console.log(client.rooms);
-            console.log(payload);
+        client.on("disconnect", () => {
+            console.log("[DSC] Client disconnected: ", client.userid.slice(0,5));
             server.switchPlayersLobby(client, client.lobby, null);
         });
 

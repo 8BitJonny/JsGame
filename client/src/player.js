@@ -23,6 +23,9 @@ module.exports.Player = class Player extends GameObject {
         ];
 
         this.collisionDetection = null;
+
+        this.lastInputID = -1;
+        this.inputHistory = [];
     };
 
     update(timePassed) {
@@ -58,37 +61,64 @@ module.exports.Player = class Player extends GameObject {
         super.update(timePassed);
     };
 
-    movePlayer(keysDown) {
-        var newVelocity = new Vector(0,0);
+    updateVelocity() {
+        if (!this.inputHistory.length) {
+            // No Inputs to process
+            return
+        }
+
+        const newVelocity = new Vector(0, 0);
         let oldFacingDirection = this.facingDirection;
 
-        // Change speed and faced direction according to keyboard input
-        if (keysDown.includes("KeyW") || keysDown.includes("ArrowUp")) {
-            newVelocity.y -= this.MAXSPEED;
-            this.facingDirection = 1;
-        }
+        for (let inputIndex = 0; inputIndex < this.inputHistory.length; inputIndex++) {
+            if (this.inputHistory[inputIndex].stateIndex <= this.lastInputID) {
+                // Skipping this input because we already processed it
+                continue
+            }
 
-        if (keysDown.includes("KeyS") || keysDown.includes("ArrowDown")) {
-            newVelocity.y += this.MAXSPEED;
-            this.facingDirection = 3;
-        }
 
-        if (keysDown.includes("KeyA") || keysDown.includes("ArrowLeft")) {
-            newVelocity.x -= this.MAXSPEED;
-            this.facingDirection = 4;
-        }
+            const keysDown = this.inputHistory[inputIndex].keysDown;
+            for (let keyIndex = 0; keyIndex < keysDown.length; keyIndex++) {
 
-        if (keysDown.includes("KeyD") || keysDown.includes("ArrowRight")) {
-            newVelocity.x += this.MAXSPEED;
-            this.facingDirection = 2;
+                let key = keysDown[keyIndex];
+                if (key === "KeyW" || key === "ArrowUp") {
+                    newVelocity.y -= this.MAXSPEED;
+                } else if (key === "KeyS" || key === "ArrowDown") {
+                    newVelocity.y += this.MAXSPEED;
+                } else if (key === "KeyA" || key === "ArrowLeft") {
+                    newVelocity.x -= this.MAXSPEED;
+                } else if (key === "KeyD" || key === "ArrowRight") {
+                    newVelocity.x += this.MAXSPEED;
+                }
+            }
+        }
+        this.lastInputID = this.inputHistory[this.inputHistory.length - 1].stateIndex;
+
+        // Figure out the facing Direction
+        if (newVelocity.x === 0 && newVelocity.y === 0) {
+            this.facingDirection = 0;
+        } else if (newVelocity.x === 0) {
+            if (newVelocity.y < 0) {
+                this.facingDirection = 1;
+            } else {
+                this.facingDirection = 3;
+            }
+        } else if (newVelocity.y === 0) {
+            if (newVelocity.x < 0) {
+                this.facingDirection = 4;
+            } else {
+                this.facingDirection = 2;
+            }
+        } else {
+            if (newVelocity.x < 0) {
+                this.facingDirection = 4;
+            } else {
+                this.facingDirection = 2;
+            }
         }
 
         if (oldFacingDirection !== this.facingDirection) {
             this.spriteInterpreter = this.spriteInterpreterList[this.facingDirection]
-        }
-
-        if (keysDown.length === 0) {
-            this.facingDirection = 0;
         }
 
         this.velocity = newVelocity;
@@ -106,13 +136,16 @@ module.exports.Player = class Player extends GameObject {
         }
     };
 
+    // This function returns a small an compact object describing the player state
+    // It is only used by the server, NOT by the client.
     returnNetworkData() {
         return {
-            p: {
+            p: {                        // Send the position
                 x: this.position.x,
                 y: this.position.y
             },
-            f: this.facingDirection
+            f: this.facingDirection,    // Send the direction the player is facing
+            si: this.lastInputID         // Send the last process input
         }
     }
 };

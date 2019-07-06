@@ -21,7 +21,7 @@ module.exports.Lobby = class Lobby {
 
     // Connects Player to Lobby
     addPlayer(playerID) {
-        console.log("connects: " + playerID.slice(0,5) + " to Lobby: ", this.id);
+        console.log("[LBY] Connects: " + playerID.slice(0,5) + " to Lobby: ", this.id);
         let newPlayer = new Player(null, 100, 100); //Todo Later on spawn him on map defined spawn point
         newPlayer.collisionDetection = this.gameEngine.collisionDetection;
         newPlayer.hitBox = {                        //Todo That is really bad written
@@ -33,7 +33,7 @@ module.exports.Lobby = class Lobby {
 
     // Disconnects Player fro Lobby
     removePlayer(playerID) {
-        console.log("disconnects: " + playerID.slice(0,5) + " from Lobby: ", this.id);
+        console.log("[LBY] Disconnects: " + playerID.slice(0,5) + " from Lobby: ", this.id);
         delete this.players[playerID];
     }
 
