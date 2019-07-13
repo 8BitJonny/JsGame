@@ -25,6 +25,7 @@ module.exports.Game = class Game {
         this.assetLoader = new AssetLoader();
     };
 
+    // start game
     start() {
         this.setupCanvas();
 
@@ -33,6 +34,7 @@ module.exports.Game = class Game {
         this.waitForLoadedAssetsAndStart();
     }
 
+    // setup canvas
     setupCanvas() {
         this.ui.addAutoResizeCanvas();
 
@@ -43,6 +45,7 @@ module.exports.Game = class Game {
         this.ctxBackground.imageSmoothingEnabled = false;
     }
 
+    // main game loop with update and draw method call
     gameLoop(time) {
         let timeSinceLastFrame = (time - this.lastFrameTime)/16;     //how much time has passed since last drawn frame relative to our standard interval of 16 ms
         this.lastFrameTime = time;
@@ -55,6 +58,7 @@ module.exports.Game = class Game {
         requestAnimationFrame(this.gameLoop.bind(this));
     }
 
+    // wait for everything to load and display loading screen while doing it
     waitForLoadedAssetsAndStart() {
         if (this.assetLoader.isFinishedLoading() === false) {
             this.ui.drawLoadingScreen();
@@ -68,6 +72,7 @@ module.exports.Game = class Game {
         }
     }
 
+    // initialize Gameobject like map, the character, inputhandler, ...
     initializeGameObjects() {
         this.map = new Map(this.assetLoader.mapLayouts["mainLobby"], this.assetLoader.sprites["mainLobby"], 240, 24, 10);
         this.character = new Player(this.assetLoader.sprites["player1"], 100, 100);
@@ -83,6 +88,7 @@ module.exports.Game = class Game {
         this.character.setCollisionDetectionObject(this.collisionDetection);
     }
 
+    // draw map, character, objects and onlinePlayer
     draw() {
         this.map.drawForeground(this.ctxForeground);
         for (let i = 0; i < this.objects.length; i++) {
@@ -97,28 +103,29 @@ module.exports.Game = class Game {
             }
         }
     };
-    
+
+    // update the positions of all objects
     update(timePassed) {
         this.inputHandler.handleInput();
-        this.networking.sendInput(this.inputHandler.prepareAndReturnInputStateForServer());
+        let inputStateForServer = this.inputHandler.prepareAndReturnInputStateForServer()
+        this.networking.sendInput(inputStateForServer);
 
         for (let i = 0; i < this.objects.length; i++) {
             let object = this.objects[i];
             object.update(timePassed);
         }
 
+        // Process the received server updates and
+        // calculate online player position with interpolation
+        this.networking.processNetUpdates();
+
         // Do client side prediction
         // While we wait on the server response we calculate the next character position on our own
         // Upon receiving server confirmation, we then update the character positions accordingly
         this.character.update(timePassed);
-
-        /*for (let playerId in this.onlinePlayer) {
-            if (this.onlinePlayer.hasOwnProperty(playerId)) {
-              this.onlinePlayer[playerId].update(timePassed)
-            }
-        }*/
     };
-    
+
+    // connect to the server
     connectToServer() {
         this.networking = new Networking('http://localhost:4004', this);
     };

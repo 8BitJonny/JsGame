@@ -7,7 +7,6 @@ module.exports.InputHandler = class InputHandler{
             keysDown: []
         };
         this.inputHistory = [];
-        this.lastSendInput = 0;
 
         document.addEventListener("keydown",event => {
             switch(event.code) {
@@ -50,6 +49,7 @@ module.exports.InputHandler = class InputHandler{
     handleInput() {
         if (this.inputState.keysDown.length > 0) {
             this.inputState.stateIndex ++;              // Later on we can filter out keys that aren't relevant for the server like pause button pressed
+
             var newInputState = {
                 stateIndex: this.inputState.stateIndex,
                 keysDown: this.inputState.keysDown
@@ -63,7 +63,6 @@ module.exports.InputHandler = class InputHandler{
     };
 
     prepareAndReturnInputStateForServer() {
-        this.lastSendInput = this.inputState.stateIndex;
         return this.inputState;
     }
 };

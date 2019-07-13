@@ -32,6 +32,7 @@ module.exports.Server = class {
         }
     }
 
+    // handle player input
     handlePlayerInput(lobbyID, playerID, payload) {
         //check if player is really connected to given lobby and let the lobby handle his input
         if (this.lobbies.hasOwnProperty(lobbyID)) {

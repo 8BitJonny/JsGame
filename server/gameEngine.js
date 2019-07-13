@@ -1,4 +1,5 @@
 const { CollisionDetection } = require("../client/src/collisionDetection");
+const { fix } = require("../client/src/utils");
 
 const frameTime = 10; //on server we run at 45ms, 22hz
 const vendors = [ 'ms', 'moz', 'webkit', 'o' ];
@@ -29,9 +30,14 @@ module.exports.GameEngine = class {
         this.lastState = {};
         this.collisionDetection = new CollisionDetection(this.lobby.map.colliders);
 
-        this.lastFrameTime = 0;
+        // some variables for time management
+        this._deltaTime = 16;
+        this._lastTimeStamp = new Date().getTime();
+        this.local_time = 0;
+        this.create_timer();
     }
 
+    // handle received player input
     handlePlayerInput(playerID, payload) {
         let player = this.lobby.players[playerID];
         player.inputHistory.push({
@@ -41,9 +47,9 @@ module.exports.GameEngine = class {
         player.updateVelocity();
     }
 
-    update(time) {
-        let timeSinceLastFrame = (time - this.lastFrameTime) / 16;     //how much time has passed since last drawn frame relative to our standard interval of 16 ms
-        this.lastFrameTime = time;
+    // update all players and send every connected client a new server state back
+    update() {
+        let timeSinceLastFrame = this._deltaTime / 7;     //how much time has passed since last drawn frame relative to our standard interval of 16 ms
 
         // Update Position based on current set velocity.
         for (let playerID in this.lobby.players) {
@@ -54,12 +60,14 @@ module.exports.GameEngine = class {
 
         // build new serverState
         this.lastState = {
-            p: this.returnNetworkDataForAllPlayers()
+            p: this.returnNetworkDataForAllPlayers(),
+            t: fix(this.local_time)
         };
         this.lobby.broadcast("serverstate", this.lastState);
         window.requestAnimationFrame(this.update.bind(this));
     }
 
+    // reduce player data to the minimum that is needed to be send over the network
     returnNetworkDataForAllPlayers() {
         let networkData = {};
         for (let playerID in this.lobby.players) {
@@ -68,5 +76,14 @@ module.exports.GameEngine = class {
             }
         }
         return networkData;
+    }
+
+    // create an accurate time
+    create_timer() {
+        setInterval(function(){
+            this._deltaTime = new Date().getTime() - this._lastTimeStamp;
+            this._lastTimeStamp = new Date().getTime();
+            this.local_time += this._deltaTime/1000;
+        }.bind(this), 4);
     }
 };

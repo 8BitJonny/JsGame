@@ -1,5 +1,6 @@
 const { Player } = require("./player");
 const { Vector } = require("./vector");
+const { fix, v_lerp } = require("./utils");
 
 module.exports.Networking = class Networking {
     constructor(ip,game) {
@@ -16,14 +17,25 @@ module.exports.Networking = class Networking {
 
         this.networkStatus = document.getElementById("connectionStatus");
         this.pingHtml = document.getElementById("ping");
+        this.clientTimeHtml = document.getElementById("clientTime");
+        this.serverTimeHtml = document.getElementById("serverTime");
 
         // The amount of server messages we want to cache per frame for the last second.
         // In the case of Buffersize = 2 we store 60fps * Buffersize which is 60 * 2 so 120 Server Messages to be able to interpolate.
-        this.BUFFERSIZE = 2;
+        this.BUFFERSIZE = 1;
+        this.NET_OFFSET = 0.1; // 100ms behind the actual server messages to smooth out online player
 
+        // Because of the set NET_OFFSET our Client time is a bit behind the actual
+        // server time to be ale to interpolate
+        this.serverTime = 0;
+        this.clientTime = 0;
+
+        // A list of received updates from the server with the max length of
+        // 60 fps * BUFFERSIZE
         this.serverUpdates = [];
     }
 
+    // Send a Ping every X seconds to the server to measure it
     startPingTimer() {
         setInterval(() => {
             this.last_ping_time = new Date().getTime();
@@ -38,6 +50,8 @@ module.exports.Networking = class Networking {
         }
     }
 
+    // Corrects the previous made Client Side prediction with the newest received
+    // server updates
     clientPredictionCorrection() {
         const lastUpdate = this.serverUpdates[this.serverUpdates.length - 1];
 
@@ -46,12 +60,16 @@ module.exports.Networking = class Networking {
 
         let localInputIndex = -1;
 
+        // Find out which index the latest confirmed input at the server
+        // has in our Input History List
         for (let i = 0; i < this.game.character.inputHistory.length; i++) {
             if (this.game.character.inputHistory[i].stateIndex === lastInputProcessedOnServer) {
                 localInputIndex = i;
             }
         }
 
+        // If we found the index. Correct that position and reapply all the inputs
+        // that happened after it
         if (localInputIndex > -1 ) {
             const inputsToClear = localInputIndex+1;
             this.game.inputHandler.inputHistory.splice(0,inputsToClear);
@@ -61,11 +79,97 @@ module.exports.Networking = class Networking {
         }
     }
 
-    updatePlayer(playerToUpdate, playerFromServer) {
-        playerToUpdate.position.x = playerFromServer.p.x;
-        playerToUpdate.position.y = playerFromServer.p.y;
-        playerToUpdate.facing = playerFromServer.f;
-        playerToUpdate.spriteInterpreter = playerToUpdate.spriteInterpreterList[playerFromServer.f];
+    // Process the Network Updates and Interpolate the positions for all objects
+    // coming from online
+    processNetUpdates() {
+        if (this.serverUpdates.length === 0) {
+            return
+        }
+
+        // Prepare for Interpolation
+        let previous = null;
+        let target = null;
+
+        let a = 0;
+        let b = 0;
+        let debug = [];
+
+        // find out between which two serverupdates we are currently because we
+        // NET_OFFSET amount of seconds behind the server
+        for (let i = 0; i < this.serverUpdates.length - 1; i++) {
+            let point = this.serverUpdates[i];
+            let next_point = this.serverUpdates[i+1];
+
+            a = point.t;
+            b = next_point.t;
+            debug.push({a,b});
+
+            if (this.clientTime >= point.t && next_point.t > this.clientTime) {
+                previous = point;
+                target = next_point;
+                break;
+            }
+        }
+
+        // Error because we didn't find the previous and next server update
+        if (!previous || !target) {
+            console.error("shouldn happen: \n Client Time: ", this.clientTime, " \n point time: ", a, " \ next time: ", b );
+            console.error(debug);
+            previous = this.serverUpdates[0];
+            target = this.serverUpdates[0];
+        }
+
+        let relativeDistance = null;
+
+        // Calculate how far we are in between the previous and the next server update
+        // in percent.
+        if (previous && target) {
+            let currentDistance = this.clientTime - previous.t;
+            let maxDistance = target.t - previous.t;
+            relativeDistance = fix(currentDistance/maxDistance);
+        }
+
+        // Catch corner cases with the relativeDistance in percent
+        if( isNaN(relativeDistance) ) relativeDistance = 0;
+        if(relativeDistance === -Infinity) relativeDistance = 0;
+        if(relativeDistance === Infinity) relativeDistance = 0;
+
+        // iterate over every player send from the server
+        for (let playerId in target.p) {
+            if (!target.p.hasOwnProperty(playerId)) {
+                // The object doesn't have the property and we just skip it
+                continue
+            }
+
+            if (this.socket.userid === playerId) {
+                // we don't want to interpolate ourselve
+                continue
+            }
+
+            const targetPlayerState = target.p[playerId];
+
+
+            if (this.game.onlinePlayer.hasOwnProperty(playerId)) {
+                // The player object already exists and we just need to update him
+                if (!previous.p.hasOwnProperty(playerId)) {
+                    // The object doesn't have the property and we just skip it
+                    continue
+                }
+
+                let basePlayerState = previous.p[playerId];
+                let onlinePlayer = this.game.onlinePlayer[playerId];
+
+                // calculate the position based on the previous calculated percentage
+                onlinePlayer.position = v_lerp(basePlayerState.p, targetPlayerState.p, relativeDistance);
+                // update player
+                onlinePlayer.facing = targetPlayerState.f;
+                onlinePlayer.spriteInterpreter = onlinePlayer.spriteInterpreterList[targetPlayerState.f];
+            } else {
+                // This online player recently joined and is not in the onlinePlayer array
+                // Therefore create a new entry for him in the array
+                this.game.onlinePlayer[playerId] = new Player(this.game.assetLoader.sprites["player1"], targetPlayerState.p.x, targetPlayerState.p.y)
+            }
+        }
     }
 
     //////////////////////////////////////////
@@ -93,6 +197,9 @@ module.exports.Networking = class Networking {
 
         this.serverUpdates.push(payload);
 
+        this.serverTime = payload.t;
+        this.clientTime = fix(this.serverTime - this.NET_OFFSET);
+
         // Clear the oldest serverUpdates if we exceed the array length limit
         if(this.serverUpdates.length > ( 60*this.BUFFERSIZE )) {
             const amountToClear = this.serverUpdates.length - ( 60*this.BUFFERSIZE );
@@ -101,35 +208,20 @@ module.exports.Networking = class Networking {
 
         // Apply the server state for each player
         for (let playerId in payload.p) {
-            if (!payload.p.hasOwnProperty(playerId)) {
-                // The object doesn't have the property and we just skip it
-                return
-            }
-
-            if (!Networking.isValidNetworkObject(payload.p[playerId])) {
-                console.error("Network Player Object with ID: ", playerId, " is not a valid object");
-                return
-            }
-
-            const playerFromServer = payload.p[playerId];
-
             if (this.socket.userid === playerId) {
                 // This is our player instance
-                this.clientPredictionCorrection();
-            } else {
-                // This is one of the online players
-
-                if (this.game.onlinePlayer.hasOwnProperty(playerId)) {
-                    // The player object already exists and we just need to update him
-                    const playerToUpdate = this.game.onlinePlayer[playerId];
-                    this.updatePlayer(playerToUpdate, playerFromServer)
-                } else {
-                    // This online player recently joined and is not in the onlinePlayer array
-                    // Therefore create a new entry for him in the array
-                    this.game.onlinePlayer[playerId] = new Player(this.game.assetLoader.sprites["player1"], playerFromServer.p.x, playerFromServer.p.y)
+                if (!payload.p.hasOwnProperty(playerId)) {
+                    // The object doesn't have the property and we just skip it
+                    return
                 }
-            }
 
+                if (!Networking.isValidNetworkObject(payload.p[playerId])) {
+                    console.error("Network Player Object with ID: ", playerId, " is not a valid object");
+                    return
+                }
+
+                this.clientPredictionCorrection();
+            }
         }
 
 

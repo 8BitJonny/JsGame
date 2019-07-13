@@ -37,6 +37,7 @@ module.exports.Lobby = class Lobby {
         delete this.players[playerID];
     }
 
+    // handlePlayerInput
     handlePlayerInput(playerID, payload) {
         this.gameEngine.handlePlayerInput(playerID, payload);
     }

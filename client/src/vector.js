@@ -1,7 +1,7 @@
 module.exports.Vector = class Vector {
     constructor(x,y) {
-        this.x = x;
-        this.y = y;
+        this.x = fix(x);
+        this.y = fix(y);
     };
 
     copy() {
@@ -20,6 +20,12 @@ module.exports.Vector = class Vector {
 
     // scalar multiplication. see https://www.mathebibel.de/skalarmultiplikation
     mul_scalar(scalar) {
-        return new Vector(Number((this.x * scalar).toFixed(3)), Number((this.y * scalar).toFixed(3)));
+        return new Vector(this.x * scalar, this.y * scalar);
     }
 };
+
+// Todo: Make it cleaner: Duplicated Code
+function fix (int,n) {
+    n = n || 3;
+    return parseFloat(int.toFixed(n));
+}
