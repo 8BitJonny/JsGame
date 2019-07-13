@@ -5,6 +5,7 @@ const { Networking } = require("./networking");
 const { AssetLoader } = require("./assetLoader");
 const { InputHandler } = require("./inputHandler");
 const { CollisionDetection } = require("./collisionDetection");
+import Camera from "./camera";
 
 module.exports.Game = class Game {
     constructor() {
@@ -15,6 +16,7 @@ module.exports.Game = class Game {
 
         this.ui = new UI();
 
+        this.camera = new Camera();
         this.map = {};
         this.objects = [];
         this.character = {};
@@ -23,8 +25,9 @@ module.exports.Game = class Game {
         this.inputHandler = {};
         this.collisionDetection = {};
         this.assetLoader = new AssetLoader();
+        this.debugShow = false;
     };
-
+    
     // start game
     start() {
         this.setupCanvas();
@@ -51,7 +54,8 @@ module.exports.Game = class Game {
         this.lastFrameTime = time;
 
         this.ctxForeground.clearRect(0,0,this.ui.cfg.width, this.ui.cfg.height);
-        
+        this.ctxBackground.clearRect(0,0,this.ui.cfg.width, this.ui.cfg.height);
+      
         this.update(timeSinceLastFrame);
         this.draw();
 
@@ -90,18 +94,36 @@ module.exports.Game = class Game {
 
     // draw map, character, objects and onlinePlayer
     draw() {
+        this.ctxBackground.save();
+        this.ctxForeground.save();
+        
+        this.ctxBackground.translate(this.camera.position.x, this.camera.position.y);
+        this.ctxForeground.translate(this.camera.position.x, this.camera.position.y);
+
         this.map.drawForeground(this.ctxForeground);
-        for (let i = 0; i < this.objects.length; i++) {
+        this.map.drawBackground(this.ctxBackground);
+        
+        for (var i = 0; i < this.objects.length; i++) {
             let object = this.objects[i];
             object.draw(this.ctxForeground);
         }
         this.character.draw(this.ctxForeground);
         
-        for (let playerId in this.onlinePlayer) {
+        if(this.debugShow === true){
+            for (var i = 0; i < this.collisionDetection.colliders.length; i++) {
+                let object = this.collisionDetection.colliders[i];
+                object.drawDebug(this.ctxForeground);
+            }; 
+            this.character.drawDebug(this.ctxForeground);
+        };
+
+        for (var playerId in this.onlinePlayer) {
             if (this.onlinePlayer.hasOwnProperty(playerId)) {
                 this.onlinePlayer[playerId].draw(this.ctxForeground)
-            }
-        }
+            };
+        };
+        this.ctxBackground.restore();
+        this.ctxForeground.restore();
     };
 
     // update the positions of all objects
@@ -123,6 +145,7 @@ module.exports.Game = class Game {
         // While we wait on the server response we calculate the next character position on our own
         // Upon receiving server confirmation, we then update the character positions accordingly
         this.character.update(timePassed);
+        this.camera.moveToKeepObjectFocused(this.character);
     };
 
     // connect to the server

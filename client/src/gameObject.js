@@ -35,7 +35,7 @@ module.exports.GameObject = class GameObject {
         this.position.add(distanceTraveled);
     };
     
-    drawDebug() {
+    drawDebug(ctx) {
         ctx.strokeStyle = "red";
         ctx.strokeRect(this.position.x,this.position.y,this.hitBox.width,this.hitBox.height);
     };

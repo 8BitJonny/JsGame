@@ -3,7 +3,7 @@ const { GameObject } = require("./gameObject");
 
 module.exports.Map = class Map {
     constructor(mapJson, mapImage, totalShapeCount, shapesInRow, shapesInColumn){
-        this.SCALE = 2;
+        this.SCALE = 4;
         this.spriteinterpreter = mapImage != null ? new SpriteInterpreter(
             mapImage,
             this.SCALE,
