@@ -32,7 +32,7 @@ module.exports.GameObject = class GameObject {
         // we have to multiply this with the seconds that have passed
         // to get the value we have to add to the current position
         let distanceTraveled = this.velocity.mul_scalar(timePassed);
-        this.position.add(distanceTraveled);
+        this.position = this.position.add(distanceTraveled);
     };
     
     drawDebug(ctx) {

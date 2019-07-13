@@ -5,7 +5,7 @@ const { Networking } = require("./networking");
 const { AssetLoader } = require("./assetLoader");
 const { InputHandler } = require("./inputHandler");
 const { CollisionDetection } = require("./collisionDetection");
-import Camera from "./camera";
+const { Camera } = require("./camera");
 
 module.exports.Game = class Game {
     constructor() {
@@ -150,6 +150,6 @@ module.exports.Game = class Game {
 
     // connect to the server
     connectToServer() {
-        this.networking = new Networking('https://play-pago.com', this);
+        this.networking = new Networking('http://localhost:4004', this);
     };
 };
