@@ -1,4 +1,4 @@
-export default class UI {
+module.exports.UI = class UI {
     constructor() {
         this.cfg = document.getElementById("foreground");   //cfg = canvas foreground
         this.cbg = document.getElementById("background");   //cbg = canvas background

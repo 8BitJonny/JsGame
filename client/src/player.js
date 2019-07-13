@@ -1,14 +1,14 @@
-import GameObject from "./gameObject";
-import SpriteInterpreter from "./spriteInterpreter";
-import Vector from "./vector";
-import CollisionDetection from "./collisionDetection";
+const { GameObject } = require("./gameObject");
+const { SpriteInterpreter } = require("./spriteInterpreter");
+const { Vector } = require("./vector");
+const { CollisionDetection } = require("./collisionDetection");
 
-export default class Player extends GameObject {
+module.exports.Player = class Player extends GameObject {
     constructor(imgSprite,x,y){
         let PADDINGX = 34;
         let PADDINGY = 10;
         let SCALE = 1;
-        let spriteInterpreter = new SpriteInterpreter(imgSprite, SCALE, 18, 0, 9, 4, PADDINGX, PADDINGY);
+        let spriteInterpreter = imgSprite != null ? new SpriteInterpreter(imgSprite, SCALE, 18, 0, 9, 4, PADDINGX, PADDINGY) : null;
         
         super(spriteInterpreter, x, y);
         this.SCALE = SCALE;
@@ -16,16 +16,19 @@ export default class Player extends GameObject {
         this.facingDirection = 0;
         this.spriteInterpreterList = [
             spriteInterpreter,
-            new SpriteInterpreter(imgSprite, this.SCALE,  1, 7, 9, 4, PADDINGX, PADDINGY, 10),
-            new SpriteInterpreter(imgSprite, this.SCALE, 27, 7, 9, 4, PADDINGX, PADDINGY, 10),
-            new SpriteInterpreter(imgSprite, this.SCALE, 19, 7, 9, 4, PADDINGX, PADDINGY, 10),
-            new SpriteInterpreter(imgSprite, this.SCALE,  9, 7, 9, 4, PADDINGX, PADDINGY, 10)
+            imgSprite != null ? new SpriteInterpreter(imgSprite, this.SCALE,  1, 7, 9, 4, PADDINGX, PADDINGY, 10) : null,
+            imgSprite != null ? new SpriteInterpreter(imgSprite, this.SCALE, 27, 7, 9, 4, PADDINGX, PADDINGY, 10) : null,
+            imgSprite != null ? new SpriteInterpreter(imgSprite, this.SCALE, 19, 7, 9, 4, PADDINGX, PADDINGY, 10) : null,
+            imgSprite != null ? new SpriteInterpreter(imgSprite, this.SCALE,  9, 7, 9, 4, PADDINGX, PADDINGY, 10) : null
         ];
 
         this.collisionDetection = null;
+
+        this.lastInputID = -1;
+        this.inputHistory = [];
     };
 
-    update() {
+    update(timePassed) {
         if (this.collisionDetection != null) {
             //check for Collision before updating position
             let oldPosition = this.position.copy();
@@ -55,32 +58,63 @@ export default class Player extends GameObject {
             this.position = oldPosition.copy();
         }
 
-        super.update();
+        super.update(timePassed);
     };
 
-    movePlayer(keysDown) {
-        var newVelocity = new Vector(0,0);
+    updateVelocity() {
+        if (!this.inputHistory.length) {
+            // No Inputs to process
+            return
+        }
+
+        const newVelocity = new Vector(0, 0);
         let oldFacingDirection = this.facingDirection;
 
-        // Change speed and faced direction according to keyboard input
-        if (keysDown.includes("KeyW") || keysDown.includes("ArrowUp")) {
-            newVelocity.y -= this.MAXSPEED;
-            this.facingDirection = 1;
-        }
+        for (let inputIndex = 0; inputIndex < this.inputHistory.length; inputIndex++) {
+            if (this.inputHistory[inputIndex].stateIndex <= this.lastInputID) {
+                // Skipping this input because we already processed it
+                continue
+            }
 
-        if (keysDown.includes("KeyS") || keysDown.includes("ArrowDown")) {
-            newVelocity.y += this.MAXSPEED;
-            this.facingDirection = 3;
-        }
 
-        if (keysDown.includes("KeyA") || keysDown.includes("ArrowLeft")) {
-            newVelocity.x -= this.MAXSPEED;
-            this.facingDirection = 4;
-        }
+            const keysDown = this.inputHistory[inputIndex].keysDown;
+            for (let keyIndex = 0; keyIndex < keysDown.length; keyIndex++) {
 
-        if (keysDown.includes("KeyD") || keysDown.includes("ArrowRight")) {
-            newVelocity.x += this.MAXSPEED;
-            this.facingDirection = 2;
+                let key = keysDown[keyIndex];
+                if (key === "KeyW" || key === "ArrowUp") {
+                    newVelocity.y -= this.MAXSPEED;
+                } else if (key === "KeyS" || key === "ArrowDown") {
+                    newVelocity.y += this.MAXSPEED;
+                } else if (key === "KeyA" || key === "ArrowLeft") {
+                    newVelocity.x -= this.MAXSPEED;
+                } else if (key === "KeyD" || key === "ArrowRight") {
+                    newVelocity.x += this.MAXSPEED;
+                }
+            }
+        }
+        this.lastInputID = this.inputHistory[this.inputHistory.length - 1].stateIndex;
+
+        // Figure out the facing Direction
+        if (newVelocity.x === 0 && newVelocity.y === 0) {
+            this.facingDirection = 0;
+        } else if (newVelocity.x === 0) {
+            if (newVelocity.y < 0) {
+                this.facingDirection = 1;
+            } else {
+                this.facingDirection = 3;
+            }
+        } else if (newVelocity.y === 0) {
+            if (newVelocity.x < 0) {
+                this.facingDirection = 4;
+            } else {
+                this.facingDirection = 2;
+            }
+        } else {
+            if (newVelocity.x < 0) {
+                this.facingDirection = 4;
+            } else {
+                this.facingDirection = 2;
+            }
         }
 
         if (oldFacingDirection !== this.facingDirection) {
@@ -99,6 +133,19 @@ export default class Player extends GameObject {
     setCollisionDetectionObject(object) {
         if (object instanceof CollisionDetection) {
             this.collisionDetection = object;
-        };
+        }
     };
+
+    // This function returns a small an compact object describing the player state
+    // It is only used by the server, NOT by the client.
+    returnNetworkData() {
+        return {
+            p: {                        // Send the position
+                x: this.position.x,
+                y: this.position.y
+            },
+            f: this.facingDirection,    // Send the direction the player is facing
+            si: this.lastInputID         // Send the last process input
+        }
+    }
 };

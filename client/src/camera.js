@@ -1,9 +1,7 @@
-import Vector from "./vector";
-import GameObject from "./gameObject";
+const { Vector }  = require("./vector");
+const { GameObject } = require("./gameObject");
 
-
-
-export default class Camera {
+module.exports.Camera = class Camera {
     constructor() {
         this.position = new Vector(0, 0);
         this.frameCount = 1;

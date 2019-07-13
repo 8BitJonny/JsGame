@@ -1,6 +1,6 @@
-import Vector from "./vector";
+const { Vector } = require("./vector");
 
-export default class GameObject {
+module.exports.GameObject = class GameObject {
     constructor(spriteInterpreter, x, y) {
         this.spriteInterpreter = spriteInterpreter;
         this.position = new Vector(x,y);
@@ -22,13 +22,17 @@ export default class GameObject {
 
         if(this.spriteInterpreter != null){
             this.spriteInterpreter.draw(ctx);
-        };
+        }
 
         ctx.restore();
     };
     
-    update() {
-        this.position = this.position.add(this.velocity);
+    update(timePassed) {
+        // the velocity represent the speed in pixels per second.
+        // we have to multiply this with the seconds that have passed
+        // to get the value we have to add to the current position
+        let distanceTraveled = this.velocity.mul_scalar(timePassed);
+        this.position = this.position.add(distanceTraveled);
     };
     
     drawDebug(ctx) {

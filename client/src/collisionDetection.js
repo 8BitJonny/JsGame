@@ -1,12 +1,14 @@
-export default class CollisionDetection {
+const { GameObject } = require("./gameObject");
+
+module.exports.CollisionDetection = class CollisionDetection {
     constructor(colliders) {
         this.colliders = colliders;
-    }
+    };
 
     addCollidier(obj) {
         if (obj instanceof GameObject) {
-            this.colliders.push(obj)
-        };
+            this.colliders.push(obj);
+        }
     };
 
     isColliding(position, hitBox) {
@@ -20,6 +22,6 @@ export default class CollisionDetection {
             }
         });
 
-        return isColliding
-    }
+        return isColliding;
+    };
 };

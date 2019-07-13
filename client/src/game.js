@@ -1,18 +1,18 @@
-import UI from "./ui";
-import Map from "./map";
-import Player from "./player";
-import MapData from "../img/Testmap.json";
-import GameObject from "./gameObject";
-import Networking from "./networking";
-import AssetLoader from "./assetLoader";
-import InputHandler from "./inputHandler";
-import CollisionDetection from "./collisionDetection";
-import Camera from "./camera";
+const { UI } = require("./ui");
+const { Map } = require("./map");
+const { Player } = require("./player");
+const { Networking } = require("./networking");
+const { AssetLoader } = require("./assetLoader");
+const { InputHandler } = require("./inputHandler");
+const { CollisionDetection } = require("./collisionDetection");
+const { Camera } = require("./camera");
 
-export default class Game {
+module.exports.Game = class Game {
     constructor() {
         this.ctxForeground = {};
         this.ctxBackground = {};
+
+        this.lastFrameTime = 0;
 
         this.ui = new UI();
 
@@ -26,9 +26,9 @@ export default class Game {
         this.collisionDetection = {};
         this.assetLoader = new AssetLoader();
         this.debugShow = false;
-
     };
     
+    // start game
     start() {
         this.setupCanvas();
 
@@ -37,6 +37,7 @@ export default class Game {
         this.waitForLoadedAssetsAndStart();
     }
 
+    // setup canvas
     setupCanvas() {
         this.ui.addAutoResizeCanvas();
 
@@ -47,16 +48,21 @@ export default class Game {
         this.ctxBackground.imageSmoothingEnabled = false;
     }
 
-    gameLoop() {
+    // main game loop with update and draw method call
+    gameLoop(time) {
+        let timeSinceLastFrame = (time - this.lastFrameTime)/16;     //how much time has passed since last drawn frame relative to our standard interval of 16 ms
+        this.lastFrameTime = time;
+
         this.ctxForeground.clearRect(0,0,this.ui.cfg.width, this.ui.cfg.height);
         this.ctxBackground.clearRect(0,0,this.ui.cfg.width, this.ui.cfg.height);
-
-        this.update();
+      
+        this.update(timeSinceLastFrame);
         this.draw();
-        
+
         requestAnimationFrame(this.gameLoop.bind(this));
     }
 
+    // wait for everything to load and display loading screen while doing it
     waitForLoadedAssetsAndStart() {
         if (this.assetLoader.isFinishedLoading() === false) {
             this.ui.drawLoadingScreen();
@@ -66,15 +72,16 @@ export default class Game {
             this.initializeGameObjects();
             this.map.drawBackground(this.ctxBackground);
             this.connectToServer();
-            this.gameLoop();
+            this.gameLoop(0);
         }
     }
 
+    // initialize Gameobject like map, the character, inputhandler, ...
     initializeGameObjects() {
-        this.map = new Map(MapData, this.assetLoader.sprites["map1"], 240, 24, 10);
+        this.map = new Map(this.assetLoader.mapLayouts["mainLobby"], this.assetLoader.sprites["mainLobby"], 240, 24, 10);
         this.character = new Player(this.assetLoader.sprites["player1"], 100, 100);
 
-        window.addEventListener("resize", _ => {
+        window.addEventListener("resize", () => {
             this.ctxForeground.imageSmoothingEnabled = false;
             this.ctxBackground.imageSmoothingEnabled = false;
             this.map.drawBackground(this.ctxBackground);
@@ -85,6 +92,7 @@ export default class Game {
         this.character.setCollisionDetectionObject(this.collisionDetection);
     }
 
+    // draw map, character, objects and onlinePlayer
     draw() {
         this.ctxBackground.save();
         this.ctxForeground.save();
@@ -98,15 +106,13 @@ export default class Game {
         for (var i = 0; i < this.objects.length; i++) {
             let object = this.objects[i];
             object.draw(this.ctxForeground);
-        };
+        }
         this.character.draw(this.ctxForeground);
         
         if(this.debugShow === true){
             for (var i = 0; i < this.collisionDetection.colliders.length; i++) {
                 let object = this.collisionDetection.colliders[i];
-                console.log(this.collisionDetection.colliders);
                 object.drawDebug(this.ctxForeground);
-
             }; 
             this.character.drawDebug(this.ctxForeground);
         };
@@ -118,62 +124,32 @@ export default class Game {
         };
         this.ctxBackground.restore();
         this.ctxForeground.restore();
-
-        
     };
-    
-    update() {
+
+    // update the positions of all objects
+    update(timePassed) {
         this.inputHandler.handleInput();
-        for (var i = 0; i < this.objects.length; i++) {
+        let inputStateForServer = this.inputHandler.prepareAndReturnInputStateForServer()
+        this.networking.sendInput(inputStateForServer);
+
+        for (let i = 0; i < this.objects.length; i++) {
             let object = this.objects[i];
-            object.update();
-        };
-        this.character.update();
+            object.update(timePassed);
+        }
 
-        this.networking.sendPosition(this.character);
+        // Process the received server updates and
+        // calculate online player position with interpolation
+        this.networking.processNetUpdates();
 
-        for (var playerId in this.onlinePlayer) {
-            if (this.onlinePlayer.hasOwnProperty(playerId)) {
-              this.onlinePlayer[playerId].update()
-            };
-        };
+        // Do client side prediction
+        // While we wait on the server response we calculate the next character position on our own
+        // Upon receiving server confirmation, we then update the character positions accordingly
+        this.character.update(timePassed);
         this.camera.moveToKeepObjectFocused(this.character);
     };
-    
+
+    // connect to the server
     connectToServer() {
-        this.networking = new Networking('https://bga.timonchristiansen.com', (payload) => {
-            let updatedPlayer = [];
-            for (var playerId in payload.p) {
-                var serverPlayer = payload.p[playerId];
-                if (this.networking.socket.userid === playerId) {
-                
-                } else if (this.isValidNetworkObject(serverPlayer)) {
-                    updatedPlayer.push(playerId);
-                    if (this.onlinePlayer.hasOwnProperty(playerId)) {
-                        var curPlayer = this.onlinePlayer[playerId];
-                        curPlayer.position.x = serverPlayer.position.x;
-                        curPlayer.position.y = serverPlayer.position.y;
-                        curPlayer.facing = serverPlayer.facing;
-                        curPlayer.spriteInterpreter = curPlayer.spriteInterpreterList[serverPlayer.facing];
-                    } else {
-                        this.onlinePlayer[playerId] = new Player(this.assetLoader.sprites["player1"], serverPlayer.position.x, serverPlayer.position.y)
-                    };
-                };
-            };
-
-            for (var playerId in this.onlinePlayer) {
-                if (this.onlinePlayer.hasOwnProperty(playerId)) {
-                    let index = updatedPlayer.indexOf(playerId);
-                    
-                    if(index === - 1){
-                        delete this.onlinePlayer[playerId];
-                    };
-                };
-            };
-        });
-    };
-
-    isValidNetworkObject(obj) {
-        return obj.hasOwnProperty("facing") && obj.hasOwnProperty("position") && obj.hasOwnProperty("userid")
+        this.networking = new Networking('http://localhost:4004', this);
     };
 };

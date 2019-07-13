@@ -1,17 +1,17 @@
-import SpriteInterpreter from "./spriteInterpreter";
-import GameObject from "./gameObject";
+const { SpriteInterpreter } = require("./spriteInterpreter");
+const { GameObject } = require("./gameObject");
 
-export default class Map {
+module.exports.Map = class Map {
     constructor(mapJson, mapImage, totalShapeCount, shapesInRow, shapesInColumn){
         this.SCALE = 4;
-        this.spriteinterpreter = new SpriteInterpreter(
+        this.spriteinterpreter = mapImage != null ? new SpriteInterpreter(
             mapImage,
             this.SCALE,
             0,
             totalShapeCount - 1,
             shapesInRow,
             shapesInColumn,
-        );
+        ) : null;
         this.backgroundLayers = [];
         this.foregroundLayers = [];
         this.colliders = [];
@@ -28,6 +28,10 @@ export default class Map {
     };
 
     draw(ctx, tileLayers) {
+        if (this.spriteinterpreter === null) {
+            return
+        }
+
         tileLayers.forEach(layer =>{
             let x = 0;
             let y = 0;
@@ -72,7 +76,7 @@ export default class Map {
                         this.colliders.push(newCollider);
                     });
                     break;
-            };
+            }
         });
     };
 };
