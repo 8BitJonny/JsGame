@@ -113,28 +113,28 @@ module.exports.Game = class Game {
             for (var i = 0; i < this.collisionDetection.colliders.length; i++) {
                 let object = this.collisionDetection.colliders[i];
                 object.drawDebug(this.ctxForeground);
-            }; 
+            }
             this.character.drawDebug(this.ctxForeground);
-        };
+        }
 
         for (var playerId in this.onlinePlayer) {
             if (this.onlinePlayer.hasOwnProperty(playerId)) {
                 this.onlinePlayer[playerId].draw(this.ctxForeground)
-            };
-        };
+            }
+        }
         this.ctxBackground.restore();
         this.ctxForeground.restore();
     };
 
     // update the positions of all objects
     update(timePassed) {
-        this.inputHandler.handleInput();
-        let inputStateForServer = this.inputHandler.prepareAndReturnInputStateForServer()
+        this.inputHandler.handleInput(timePassed);
+        let inputStateForServer = this.inputHandler.prepareAndReturnInputStateForServer();
         this.networking.sendInput(inputStateForServer);
 
         for (let i = 0; i < this.objects.length; i++) {
             let object = this.objects[i];
-            object.update(timePassed);
+            object.update();
         }
 
         // Process the received server updates and

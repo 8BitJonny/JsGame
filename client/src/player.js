@@ -28,7 +28,7 @@ module.exports.Player = class Player extends GameObject {
         this.inputHistory = [];
     };
 
-    update(timePassed) {
+    update() {
         if (this.collisionDetection != null) {
             //check for Collision before updating position
             let oldPosition = this.position.copy();
@@ -58,12 +58,13 @@ module.exports.Player = class Player extends GameObject {
             this.position = oldPosition.copy();
         }
 
-        super.update(timePassed);
+        super.update();
     };
 
     updateVelocity() {
         if (!this.inputHistory.length) {
             // No Inputs to process
+            this.velocity = new Vector(0, 0);
             return
         }
 
@@ -77,18 +78,18 @@ module.exports.Player = class Player extends GameObject {
             }
 
 
-            const keysDown = this.inputHistory[inputIndex].keysDown;
-            for (let keyIndex = 0; keyIndex < keysDown.length; keyIndex++) {
+            const input = this.inputHistory[inputIndex];
+            for (let keyIndex = 0; keyIndex < input.keysDown.length; keyIndex++) {
 
-                let key = keysDown[keyIndex];
+                let key = input.keysDown[keyIndex];
                 if (key === "KeyW" || key === "ArrowUp") {
-                    newVelocity.y -= this.MAXSPEED;
+                    newVelocity.y -= this.MAXSPEED * input.time;
                 } else if (key === "KeyS" || key === "ArrowDown") {
-                    newVelocity.y += this.MAXSPEED;
+                    newVelocity.y += this.MAXSPEED * input.time;
                 } else if (key === "KeyA" || key === "ArrowLeft") {
-                    newVelocity.x -= this.MAXSPEED;
+                    newVelocity.x -= this.MAXSPEED * input.time;
                 } else if (key === "KeyD" || key === "ArrowRight") {
-                    newVelocity.x += this.MAXSPEED;
+                    newVelocity.x += this.MAXSPEED * input.time;
                 }
             }
         }

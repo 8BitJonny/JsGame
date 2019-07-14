@@ -42,9 +42,9 @@ module.exports.GameEngine = class {
         let player = this.lobby.players[playerID];
         player.inputHistory.push({
             stateIndex: payload.si,
-            keysDown: payload.k
+            keysDown: payload.k,
+            time: payload.t
         });
-        player.updateVelocity();
     }
 
     // update all players and send every connected client a new server state back
@@ -54,7 +54,10 @@ module.exports.GameEngine = class {
         // Update Position based on current set velocity.
         for (let playerID in this.lobby.players) {
             if (this.lobby.players.hasOwnProperty(playerID)) {
-                this.lobby.players[playerID].update(timeSinceLastFrame);          // this player.update method also checks collision
+                let player = this.lobby.players[playerID];
+                player.updateVelocity();
+                player.update(timeSinceLastFrame);          // this player.update method also checks collision
+                player.inputHistory = [];
             }
         }
 

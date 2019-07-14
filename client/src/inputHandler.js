@@ -4,7 +4,8 @@ module.exports.InputHandler = class InputHandler{
         this.game = game;
         this.inputState = {
             stateIndex: 0,
-            keysDown: []
+            keysDown: [],
+            time: null
         };
         this.inputHistory = [];
 
@@ -46,23 +47,25 @@ module.exports.InputHandler = class InputHandler{
         });
     };
 
-    handleInput() {
-        if (this.inputState.keysDown.length > 0) {
-            this.inputState.stateIndex ++;              // Later on we can filter out keys that aren't relevant for the server like pause button pressed
+    handleInput(timePassed) {
+        this.inputState.stateIndex ++;
+        // Later on we can filter out keys that aren't relevant for the server like pause button pressed
 
-            var newInputState = {
-                stateIndex: this.inputState.stateIndex,
-                keysDown: this.inputState.keysDown
-            };
+        this.inputHistory.push({
+            stateIndex: this.inputState.stateIndex,
+            keysDown: this.inputState.keysDown.slice(),
+            time: timePassed
+        });
+        this.player.inputHistory.push({
+            stateIndex: this.inputState.stateIndex,
+            keysDown: this.inputState.keysDown.slice(),
+            time: timePassed
+        });
 
-            this.inputHistory.push(newInputState);
-            this.player.inputHistory.push(newInputState);
-
-            this.player.updateVelocity();
-        }
+        this.player.updateVelocity();
     };
 
     prepareAndReturnInputStateForServer() {
-        return this.inputState;
+        return this.inputHistory[this.inputHistory.length - 1];
     }
 };

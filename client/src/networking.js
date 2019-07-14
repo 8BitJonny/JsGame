@@ -14,21 +14,23 @@ module.exports.Networking = class Networking {
         this.socket.on("serverstate", this.onServerState.bind(this));
 
         this.startPingTimer();
+        this.create_timer();
 
         this.networkStatus = document.getElementById("connectionStatus");
         this.pingHtml = document.getElementById("ping");
-        this.clientTimeHtml = document.getElementById("clientTime");
-        this.serverTimeHtml = document.getElementById("serverTime");
 
         // The amount of server messages we want to cache per frame for the last second.
         // In the case of Buffersize = 2 we store 60fps * Buffersize which is 60 * 2 so 120 Server Messages to be able to interpolate.
         this.BUFFERSIZE = 1;
-        this.NET_OFFSET = 0.1; // 100ms behind the actual server messages to smooth out online player
+        this.NET_OFFSET = 0.2; // 200ms behind the actual server messages to smooth out online player
 
         // Because of the set NET_OFFSET our Client time is a bit behind the actual
         // server time to be ale to interpolate
         this.serverTime = 0;
         this.clientTime = 0;
+
+        this._deltaTime = 0;
+        this._lastTimeStamp = 0;
 
         // A list of received updates from the server with the max length of
         // 60 fps * BUFFERSIZE
@@ -45,14 +47,17 @@ module.exports.Networking = class Networking {
 
     // Sends the received input from the player and the StateIndex to the server e.g. which keys he pressed to move or to do an action
     sendInput(inputState) {
-        if (inputState != null) {
-            this.socket.emit("i", { k: inputState.keysDown, si: inputState.stateIndex });
-        }
+        this.lastSendSID = inputState.stateIndex;
+        this.socket.emit("i", { k: inputState.keysDown, si: inputState.stateIndex, t: inputState.time});
     }
 
     // Corrects the previous made Client Side prediction with the newest received
     // server updates
     clientPredictionCorrection() {
+        if(this.serverUpdates.length <= 0) {
+            return
+        }
+
         const lastUpdate = this.serverUpdates[this.serverUpdates.length - 1];
 
         const serverConfirmedPosition = lastUpdate.p[this.socket.userid].p;
@@ -73,6 +78,7 @@ module.exports.Networking = class Networking {
         if (localInputIndex > -1 ) {
             const inputsToClear = localInputIndex+1;
             this.game.inputHandler.inputHistory.splice(0,inputsToClear);
+            this.game.character.inputHistory.splice(0,inputsToClear);
 
             this.game.character.position = new Vector(serverConfirmedPosition.x, serverConfirmedPosition.y);
             this.game.character.lastInputID = localInputIndex;
@@ -194,7 +200,6 @@ module.exports.Networking = class Networking {
     }
 
     onServerState(payload) {
-
         this.serverUpdates.push(payload);
 
         this.serverTime = payload.t;
@@ -214,6 +219,12 @@ module.exports.Networking = class Networking {
                     // The object doesn't have the property and we just skip it
                     return
                 }
+
+                let si = payload.p[playerId].si;
+                let pos = payload.p[playerId].p;
+
+                this.lastUpdateSID = si;
+                this.lastPos = pos;
 
                 if (!Networking.isValidNetworkObject(payload.p[playerId])) {
                     console.error("Network Player Object with ID: ", playerId, " is not a valid object");
@@ -242,6 +253,15 @@ module.exports.Networking = class Networking {
                 }
             }
         }
+    }
+
+    // create an accurate time
+    create_timer() {
+        setInterval(function(){
+            this._deltaTime = new Date().getTime() - this._lastTimeStamp;
+            this._lastTimeStamp = new Date().getTime();
+            this.clientTime += this._deltaTime/1000;
+        }.bind(this), 4);
     }
 
     static isValidNetworkObject(obj) {
