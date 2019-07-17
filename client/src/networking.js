@@ -220,12 +220,6 @@ module.exports.Networking = class Networking {
                     return
                 }
 
-                let si = payload.p[playerId].si;
-                let pos = payload.p[playerId].p;
-
-                this.lastUpdateSID = si;
-                this.lastPos = pos;
-
                 if (!Networking.isValidNetworkObject(payload.p[playerId])) {
                     console.error("Network Player Object with ID: ", playerId, " is not a valid object");
                     return

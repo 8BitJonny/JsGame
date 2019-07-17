@@ -1,7 +1,7 @@
 const { CollisionDetection } = require("../client/src/collisionDetection");
 const { fix } = require("../client/src/utils");
 
-const frameTime = 10; //on server we run at 45ms, 22hz
+const frameTime = 45; //on server we run at 45ms, 22hz
 const vendors = [ 'ms', 'moz', 'webkit', 'o' ];
 let lastTime = 0;
 global.window = global.document = global;
