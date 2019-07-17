@@ -3,6 +3,8 @@ module.exports.UI = class UI {
         this.cfg = document.getElementById("foreground");   //cfg = canvas foreground
         this.cbg = document.getElementById("background");   //cbg = canvas background
         this.loadingHtml = document.getElementById("loadingAssets");
+        this.clientVersion = document.getElementById("clientVersion");
+        this.serverVersion = document.getElementById("serverVersion");
     }
 
     addAutoResizeCanvas() {
@@ -27,5 +29,10 @@ module.exports.UI = class UI {
 
     hideLoadingScreen() {
         this.loadingHtml.style.display = "none";
+    }
+
+    displayVersions(clientVersion, serverVersion) {
+        this.clientVersion.innerHTML = clientVersion;
+        this.serverVersion.innerHTML = serverVersion;
     }
 }

@@ -30,12 +30,12 @@
                 padding: 0;
                 color: white;
             }
-            #networkStats {
+            #versions {
                 position: absolute;
-                color: black;
-                padding: 5px;
-                background-color: rgba(200, 200, 200, 0.8);
-                z-index: 2;
+                bottom: 10px;
+                left: 10px;
+                z-index: 10;
+                color: white;
             }
             body {
                 margin: 0%;
@@ -44,9 +44,11 @@
         <script type="text/javascript" src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
     </head>
     <body>
-        <div id="networkStats">
-            <span>Server: <span id="connectionStatus">Offline</span></span><br>
+        <div id="versions">
             <span>Ping: <span id="ping"></span></span><br>
+            <span>Server: <span id="connectionStatus">Offline</span></span><br>
+            <span>Client version: <span id="clientVersion">/</span></span><br>
+            <span>Server version: <span id="serverVersion">/</span></span><br>
         </div>
         <div id="loadingAssets">
             <p id="loadingMessage">Loading ...</p>

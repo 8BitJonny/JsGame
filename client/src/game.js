@@ -7,6 +7,8 @@ const { InputHandler } = require("./inputHandler");
 const { CollisionDetection } = require("./collisionDetection");
 const { Camera } = require("./camera");
 
+const config = require("./config.json");
+
 module.exports.Game = class Game {
     constructor() {
         this.ctxForeground = {};
@@ -26,6 +28,8 @@ module.exports.Game = class Game {
         this.collisionDetection = {};
         this.assetLoader = new AssetLoader();
         this.debugShow = false;
+
+        this.config = config;
     };
     
     // start game
