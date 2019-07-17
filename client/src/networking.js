@@ -183,6 +183,7 @@ module.exports.Networking = class Networking {
 
     onServerConnect(payload) {
         this.socket.userid = payload.id;
+        this.game.ui.displayVersions(this.game.config.clientVersion, payload.v);
         this.networkStatus.innerHTML = "Connected";
     }
 

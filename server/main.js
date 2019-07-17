@@ -5,6 +5,8 @@ const CookieParser = require("cookie-parser");
 
 const { Server } = require("./server");
 
+const config = require("./config.json");
+
 const COOKIE_SECRET = "secret";
 
 const app = Express();
@@ -26,7 +28,7 @@ io.sockets.on('connection',
         client.userid = UUID();
         console.log("[CON] We got a new client: ", client.userid.slice(0,5));
 
-        client.emit("onconnected", { id: client.userid });
+        client.emit("onconnected", { id: client.userid, v: config.serverVersion });
         server.switchPlayersLobby(client, null, "mainLobby");
 
         io.to("mainLobby").emit("connectToRoom", { room: "mainLobby" });
