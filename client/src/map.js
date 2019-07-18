@@ -23,33 +23,46 @@ module.exports.Map = class Map {
         this.draw(ctx, this.backgroundLayers);
     };
 
-    drawForeground(ctx) {
-        this.draw(ctx, this.foregroundLayers);
+    drawForeground(ctx, objectsToDraw) {
+        this.draw(ctx, this.foregroundLayers, objectsToDraw);
     };
 
-    draw(ctx, tileLayers) {
+    draw(ctx, tileLayers, objectsToDraw = []) {
         if (this.spriteinterpreter === null) {
             return
         }
 
-        tileLayers.forEach(layer =>{
-            let x = 0;
-            let y = 0;
-            layer.data.forEach((value, index) => {
-                this.spriteinterpreter.currentShapeIndex = value - 1;
+        let layer = tileLayers[0];
+        let nextElementToDraw = 0;
 
-                x = index % layer.width;
-                y = Math.floor(index / layer.width);
-                
-                ctx.save();
-                ctx.translate(
-                    x * this.spriteinterpreter.shapeWidth * this.SCALE,
-                    y * this.spriteinterpreter.shapeHeight * this.SCALE
-                );
-                
-                this.spriteinterpreter.draw(ctx);
-                ctx.restore();
-            });
+        let x = 0;
+        let y = 0;
+        console.log("_____________")
+        layer.data.forEach((value, index) => {
+            this.spriteinterpreter.currentShapeIndex = value - 1;
+
+            x = index % layer.width;
+            y = Math.floor(index / layer.width);
+
+            ctx.save();
+            ctx.translate(
+                x * this.spriteinterpreter.shapeWidth * this.SCALE,
+                y * this.spriteinterpreter.shapeHeight * this.SCALE
+            );
+
+            this.spriteinterpreter.draw(ctx);
+            ctx.restore();
+
+            if (objectsToDraw[nextElementToDraw] !== undefined) {
+                if (objectsToDraw[nextElementToDraw].position.y > ((y) * this.spriteinterpreter.shapeHeight * this.SCALE)
+                 && objectsToDraw[nextElementToDraw].position.y < ((y + 1) * this.spriteinterpreter.shapeHeight * this.SCALE)) {
+                    console.log(y * this.spriteinterpreter.shapeHeight * this.SCALE);
+                    console.log(objectsToDraw[nextElementToDraw].position);
+                    objectsToDraw[nextElementToDraw].draw(ctx);
+                    nextElementToDraw ++;
+                    return
+                }
+            }
         });
     };
 

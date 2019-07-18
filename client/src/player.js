@@ -11,6 +11,7 @@ module.exports.Player = class Player extends GameObject {
         let spriteInterpreter = imgSprite != null ? new SpriteInterpreter(imgSprite, SCALE, 18, 0, 9, 4, PADDINGX, PADDINGY) : null;
         
         super(spriteInterpreter, x, y);
+        this.hitBox.height = 1;
         this.SCALE = SCALE;
         this.MAXSPEED = 2;
         this.facingDirection = 0;

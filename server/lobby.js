@@ -22,11 +22,11 @@ module.exports.Lobby = class Lobby {
     // Connects Player to Lobby
     addPlayer(playerID) {
         console.log("[LBY] Connects: " + playerID.slice(0,5) + " to Lobby: ", this.id);
-        let newPlayer = new Player(null, 100, 100); //Todo Later on spawn him on map defined spawn point
+        let newPlayer = new Player(null, 100, 200); //Todo Later on spawn him on map defined spawn point
         newPlayer.collisionDetection = this.gameEngine.collisionDetection;
         newPlayer.hitBox = {                        //Todo That is really bad written
             width: 30.2,
-            height: 53
+            height: 1
         };
         this.players[playerID] = newPlayer;
     }

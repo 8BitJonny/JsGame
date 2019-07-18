@@ -27,7 +27,7 @@ module.exports.Game = class Game {
         this.inputHandler = {};
         this.collisionDetection = {};
         this.assetLoader = new AssetLoader();
-        this.debugShow = false;
+        this.debugShow = true;
 
         this.config = config;
     };
@@ -104,14 +104,16 @@ module.exports.Game = class Game {
         this.ctxBackground.translate(this.camera.position.x, this.camera.position.y);
         this.ctxForeground.translate(this.camera.position.x, this.camera.position.y);
 
-        this.map.drawForeground(this.ctxForeground);
+        //Sort character, onlinePlayer and objects by y value for drawing them in the right order (Z-Index)
+        let sortedObjectsToDraw = this.sortByY();
+
         this.map.drawBackground(this.ctxBackground);
-        
+        this.map.drawForeground(this.ctxForeground, sortedObjectsToDraw);
+
         for (var i = 0; i < this.objects.length; i++) {
             let object = this.objects[i];
             object.draw(this.ctxForeground);
         }
-        this.character.draw(this.ctxForeground);
         
         if(this.debugShow === true){
             for (var i = 0; i < this.collisionDetection.colliders.length; i++) {
@@ -121,11 +123,6 @@ module.exports.Game = class Game {
             this.character.drawDebug(this.ctxForeground);
         }
 
-        for (var playerId in this.onlinePlayer) {
-            if (this.onlinePlayer.hasOwnProperty(playerId)) {
-                this.onlinePlayer[playerId].draw(this.ctxForeground)
-            }
-        }
         this.ctxBackground.restore();
         this.ctxForeground.restore();
     };
@@ -154,6 +151,26 @@ module.exports.Game = class Game {
 
     // connect to the server
     connectToServer() {
-        this.networking = new Networking('https://play-pago.com', this);
+        this.networking = new Networking('http://localhost:4004', this);
     };
+
+    // sort by Y value so we know who stands in front of who on the map
+    sortByY() {
+        function compare(a,b) {
+            if (a.position.y > b.position.y) {
+                return 1
+            }
+            if (b.position.y > a.position.y) {
+                return -1
+            }
+            return 0
+        }
+
+        let objectsToDraw = Object
+            .entries(this.onlinePlayer)
+            .map(function (x) {return x[1]});
+
+        objectsToDraw.push(this.character);
+        return objectsToDraw.sort(compare);
+    }
 };
