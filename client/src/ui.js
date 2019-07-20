@@ -5,6 +5,12 @@ module.exports.UI = class UI {
         this.loadingHtml = document.getElementById("loadingAssets");
         this.clientVersion = document.getElementById("clientVersion");
         this.serverVersion = document.getElementById("serverVersion");
+        this.loginButton = document.getElementById("login");
+        this.loginButton.onclick = this.onLogin.bind(this);
+        this.playButton = document.getElementById("play");
+        this.playButton.onclick = this.onPlay.bind(this);
+        this.playDiv = document.getElementById("playDiv");
+        this.startScreen = document.getElementById("startScreen");
     }
 
     addAutoResizeCanvas() {
@@ -35,4 +41,13 @@ module.exports.UI = class UI {
         this.clientVersion.innerHTML = clientVersion;
         this.serverVersion.innerHTML = serverVersion;
     }
-}
+
+    onLogin() {
+        this.loginButton.style.display = "none";
+        this.playDiv.style.display = "inline-block";
+    }
+
+    onPlay() {
+        this.startScreen.style.display = "none";
+    }
+};
