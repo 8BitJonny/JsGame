@@ -155,6 +155,6 @@ module.exports.Game = class Game {
 
     // connect to the server
     connectToServer() {
-        this.networking = new Networking('http://localhost:4004', this);
+        this.networking = new Networking('https://play-pago.com', this);
     };
 };
