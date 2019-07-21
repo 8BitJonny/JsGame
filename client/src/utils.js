@@ -22,7 +22,12 @@ function v_lerp(baseVector, targetVector, time) {
     );
 }
 
+function isFunction(functionToCheck) {
+    return functionToCheck && {}.toString.call(functionToCheck) === '[object Function]';
+}
+
 module.exports = {
     fix: fix,
-    v_lerp: v_lerp
+    v_lerp: v_lerp,
+    isFunction: isFunction
 };

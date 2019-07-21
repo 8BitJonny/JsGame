@@ -23,15 +23,39 @@ let server = new Server(io);
 
 io.sockets.on('connection',
     // We are given a websocket object in our function
-    function(client) {
+    function(client, name) {
 
-        client.userid = UUID();
-        console.log("[CON] We got a new client: ", client.userid.slice(0,5));
+        // Wait on initial Data to create User
+        client.on("id", (payload) => {
+            let firstLobby = "mainLobby";
 
-        client.emit("onconnected", { id: client.userid, v: config.serverVersion });
-        server.switchPlayersLobby(client, null, "mainLobby");
+            client.userid = UUID();
+            console.log("[CON] We got a new client: ", client.userid.slice(0,5));
 
-        io.to("mainLobby").emit("connectToRoom", { room: "mainLobby" });
+            server.switchPlayersLobby(client, null, firstLobby);
+
+            let player = server.lobbies[firstLobby].players[client.userid];
+            player.playerName = payload.pn;
+
+            let playerNetworkData = player.returnNetworkData();
+            playerNetworkData.pn = payload.pn;
+            playerNetworkData.id = client.userid;
+
+            let onlinePlayer = {};
+            for (let playerId in server.lobbies[firstLobby].players) {
+                if (server.lobbies[firstLobby].players.hasOwnProperty(playerId)) {
+                    let networkData = server.lobbies[firstLobby].players[playerId].returnNetworkData();
+                    networkData.pn = server.lobbies[firstLobby].players[playerId].playerName;
+
+                    onlinePlayer[playerId] = networkData;
+                }
+            }
+
+            client.emit("onconnected", { id: client.userid, v: config.serverVersion, l: firstLobby, p: onlinePlayer});
+
+            // notify everyone in the lobby of the new player
+            client.to("mainLobby").emit("connectToRoom", { newPlayer: playerNetworkData });
+        });
 
         // Upon receiving ping request from client, server sends ping back
         client.on("cp", (payload) => {

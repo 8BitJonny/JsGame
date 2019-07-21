@@ -14,6 +14,9 @@ module.exports.GameObject = class GameObject {
             height: shapeHeight 
         };
 
+        // all gameObjects that are children's of this gameObjects and are rendered relative to the parent
+        this.children = []
+
     };
 
     draw(ctx) {
@@ -22,6 +25,10 @@ module.exports.GameObject = class GameObject {
 
         if(this.spriteInterpreter != null){
             this.spriteInterpreter.draw(ctx);
+        }
+
+        for (let i = 0; i < this.children.length; i++) {
+            this.children[i].draw(ctx);
         }
 
         ctx.restore();
@@ -36,4 +43,10 @@ module.exports.GameObject = class GameObject {
         ctx.strokeStyle = "red";
         ctx.strokeRect(this.position.x,this.position.y,this.hitBox.width,this.hitBox.height);
     };
+
+    addChildren(obj) {
+        if (obj instanceof GameObject) {
+            this.children.push(obj);
+        }
+    }
 };

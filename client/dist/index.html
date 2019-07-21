@@ -70,13 +70,37 @@
                 border: solid #000000 2px;
                 text-decoration: none;
             }
-            #playDiv {
+            #playForm {
                 display: none;
                 font-size: 1.3em;
             }
             #playerName {
                 padding: 5px;
                 font-size: 1em;
+            }
+            /* This is our style for the invalid fields */
+            #playerName:invalid{
+                border-color: #900;
+                background-color: #FDD;
+            }
+            #playerName:focus:invalid {
+                outline: none;
+            }
+            .error {
+                width  : 100%;
+                padding: 0;
+
+                font-size: 80%;
+                color: white;
+                background-color: #900;
+                border-radius: 0 0 5px 5px;
+
+                -moz-box-sizing: border-box;
+                box-sizing: border-box;
+            }
+
+            .error.active {
+                padding: 0.3em;
             }
             form {
                 text-align: center;
@@ -119,13 +143,13 @@
   #####/                        /######  /#
     ###                        /     ###/
             </pre></h2>
-            <form>
-                <div id="playDiv">
-                    <label for="playerName" class="f-white">Player Name</label>
-                    <input id="playerName" class=" f-white b-black" type="text" placeholder="Enter your Online Name"><br><br>
-                    <button id="play" class="butn f-white b-black" type="button">Play</button>
-                </div>
-                <button id="login" class="butn f-white b-black" type="button">Login</button><br>
+            <form id="loginForm">
+                <button id="loginButton" class="butn f-white b-black" type="submit">Login</button><br>
+            </form>
+            <form id="playForm">
+                <input id="playerName" class=" f-white b-black" type="text" placeholder="Enter your Online Name"><br>
+                <span id="formError" class="error" aria-live="polite"></span><br><br>
+                <button id="playButton" class="butn f-white b-black" type="submit">Play</button>
             </form>
         </div>
         <canvas id="background">

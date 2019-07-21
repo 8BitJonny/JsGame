@@ -1,18 +1,25 @@
 const { GameObject } = require("./gameObject");
+const { TextDrawer } = require("./textDrawer");
 const { SpriteInterpreter } = require("./spriteInterpreter");
 const { Vector } = require("./vector");
 const { CollisionDetection } = require("./collisionDetection");
 
 module.exports.Player = class Player extends GameObject {
-    constructor(imgSprite,x,y){
+    constructor(imgSprite,x,y,playerName){
         let PADDINGX = 34;
         let PADDINGY = 10;
         let SCALE = 1;
         let spriteInterpreter = imgSprite != null ? new SpriteInterpreter(imgSprite, SCALE, 18, 0, 9, 4, PADDINGX, PADDINGY) : null;
-        
+
         super(spriteInterpreter, x, y);
         this.SCALE = SCALE;
         this.MAXSPEED = 2;
+
+        this.playerName = playerName;
+        if (spriteInterpreter != null) {
+            this.addChildren(new TextDrawer(playerName, this.spriteInterpreter.shapeWidth/2, 0));
+        }
+
         this.facingDirection = 0;
         this.spriteInterpreterList = [
             spriteInterpreter,
