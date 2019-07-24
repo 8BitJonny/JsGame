@@ -31,7 +31,7 @@
          "name":"Objektebene 1",
          "objects":[
                 {
-                 "height":14.5,
+                 "height":29.5565388397247,
                  "id":1,
                  "name":"",
                  "rotation":0,
@@ -64,7 +64,7 @@
                  "y":15.5
                 }, 
                 {
-                 "height":11.5,
+                 "height":11.1927236971485,
                  "id":4,
                  "name":"",
                  "rotation":0,
@@ -72,10 +72,10 @@
                  "visible":true,
                  "width":481,
                  "x":-1,
-                 "y":229
+                 "y":239.447394296952
                 }, 
                 {
-                 "height":96.5,
+                 "height":101.954015042935,
                  "id":5,
                  "name":"",
                  "rotation":0,
@@ -86,59 +86,59 @@
                  "y":14.5
                 }, 
                 {
-                 "height":7.5,
+                 "height":10.2904263010363,
                  "id":6,
                  "name":"",
                  "rotation":0,
                  "type":"",
                  "visible":true,
                  "width":24,
-                 "x":355.5,
-                 "y":104
+                 "x":356.007350236552,
+                 "y":116.556918354663
                 }, 
                 {
-                 "height":20.5,
+                 "height":26.0283790122629,
                  "id":7,
                  "name":"",
                  "rotation":0,
                  "type":"",
                  "visible":true,
                  "width":26,
-                 "x":339.5,
-                 "y":160.5
+                 "x":338.997420089794,
+                 "y":165.893818224276
                 }, 
                 {
-                 "height":19,
+                 "height":19.6319314986255,
                  "id":8,
                  "name":"",
                  "rotation":0,
                  "type":"",
                  "visible":true,
-                 "width":13,
-                 "x":201.5,
-                 "y":102
+                 "width":15.6857088691586,
+                 "x":200.078154128093,
+                 "y":119.378116212203
                 }, 
                 {
-                 "height":8,
+                 "height":19.2939012933016,
                  "id":9,
                  "name":"",
                  "rotation":0,
                  "type":"",
                  "visible":true,
                  "width":19,
-                 "x":70.5,
-                 "y":150.5
+                 "x":70.0002698542787,
+                 "y":150.599946029144
                 }, 
                 {
-                 "height":15.5,
-                 "id":10,
+                 "height":19.6319,
+                 "id":12,
                  "name":"",
                  "rotation":0,
                  "type":"",
                  "visible":true,
-                 "width":12.5,
-                 "x":409.5,
-                 "y":53
+                 "width":15.6857,
+                 "x":408.082303810952,
+                 "y":71.2289642756167
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -146,8 +146,8 @@
          "x":0,
          "y":0
         }],
- "nextlayerid":5,
- "nextobjectid":12,
+ "nextlayerid":6,
+ "nextobjectid":13,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.2.4",
@@ -155,7 +155,7 @@
  "tilesets":[
         {
          "firstgid":1,
-         "source":"..\/..\/Desktop\/Blocky Dungeon.tsx"
+         "source":"..\/assetRessources\/test.tsx"
         }],
  "tilewidth":16,
  "type":"map",

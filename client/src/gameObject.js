@@ -18,7 +18,7 @@ module.exports.GameObject = class GameObject {
 
     draw(ctx) {
         ctx.save();
-        ctx.translate(this.position.x, this.position.y);
+        ctx.translate(this.position.x, this.position.y - this.spriteInterpreter.shapeHeight);
 
         if(this.spriteInterpreter != null){
             this.spriteInterpreter.draw(ctx);
