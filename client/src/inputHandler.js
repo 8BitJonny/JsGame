@@ -19,6 +19,7 @@ module.exports.InputHandler = class InputHandler{
                 case "ArrowDown":
                 case "ArrowLeft":
                 case "ArrowRight":
+                case "Space":
                     if(!this.inputState.keysDown.includes(event.code)){
                         this.inputState.keysDown.unshift(event.code);
                     }
@@ -34,6 +35,7 @@ module.exports.InputHandler = class InputHandler{
                 case "ArrowDown":
                 case "ArrowLeft":
                 case "ArrowRight":
+                case "Space":
                     let index = this.inputState.keysDown.indexOf(event.code);
                     
                     if(index > - 1){

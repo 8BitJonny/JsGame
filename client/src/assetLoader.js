@@ -15,9 +15,11 @@ module.exports.AssetLoader = class AssetLoader {
     loadAssets() {
         const Player1 = require("../img/BODY_skeleton.png");
         const Map1 = require("../img/dungeon_sheet.png");
+        const Ball = require("../img/flames.png");
 
         this.sprites["player1"] = this._imageForPath(Player1);
         this.sprites["mainLobby"] = this._imageForPath(Map1);
+        this.sprites["ball"] = this._imageForPath(Ball);
 
         this.loadMapData();
 
@@ -31,10 +33,10 @@ module.exports.AssetLoader = class AssetLoader {
     _imageForPath(path) {
         let newImage = new Image();
         newImage.src = path;
-        newImage.addEventListener('load', _ => {
+        newImage.addEventListener('load', _ => {                                                    
             this.imagesToBeLoaded--
         }, false);
-        this.imagesToBeLoaded++;
+        this.imagesToBeLoaded++;                    
         return newImage;
     };
 };
