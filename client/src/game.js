@@ -28,17 +28,18 @@ module.exports.Game = class Game {
         this.collisionDetection = {};
         this.assetLoader = new AssetLoader();
         this.debugShow = false;
-
         this.config = config;
+
+        this.ui.onPlay = this.start.bind(this);
     };
     
     // start game
-    start() {
+    start(playerName) {
         this.setupCanvas();
 
         this.assetLoader.loadAssets();
 
-        this.waitForLoadedAssetsAndStart();
+        this.waitForLoadedAssetsAndStart(playerName);
     }
 
     // setup canvas
@@ -67,13 +68,13 @@ module.exports.Game = class Game {
     }
 
     // wait for everything to load and display loading screen while doing it
-    waitForLoadedAssetsAndStart() {
+    waitForLoadedAssetsAndStart(playerName) {
         if (this.assetLoader.isFinishedLoading() === false) {
             this.ui.drawLoadingScreen();
-            requestAnimationFrame(this.waitForLoadedAssetsAndStart.bind(this));
+            requestAnimationFrame(this.waitForLoadedAssetsAndStart.bind(this,playerName));
         } else {
             this.ui.hideLoadingScreen();
-            this.initializeGameObjects();
+            this.initializeGameObjects(playerName);
             this.map.drawBackground(this.ctxBackground);
             this.connectToServer();
             this.gameLoop(0);
@@ -81,9 +82,9 @@ module.exports.Game = class Game {
     }
 
     // initialize Gameobject like map, the character, inputhandler, ...
-    initializeGameObjects() {
+    initializeGameObjects(playerName) {
         this.map = new Map(this.assetLoader.mapLayouts["mainLobby"], this.assetLoader.sprites["mainLobby"], 240, 24, 10);
-        this.character = new Player(this.assetLoader.sprites["player1"], 100, 100);
+        this.character = new Player(this.assetLoader.sprites["player1"], 100, 100, playerName);
 
         window.addEventListener("resize", () => {
             this.ctxForeground.imageSmoothingEnabled = false;

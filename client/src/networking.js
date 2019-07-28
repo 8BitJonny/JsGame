@@ -7,6 +7,7 @@ module.exports.Networking = class Networking {
         this.socket = io.connect(ip);
         this.game = game;
 
+        this.socket.on('connect', this.onConnect.bind(this));
         this.socket.on("onconnected", this.onServerConnect.bind(this));
         this.socket.on("connectToRoom", this.onRoomConnect.bind(this));
         this.socket.on("disconnect", this.onServerDisconnect.bind(this));
@@ -173,7 +174,8 @@ module.exports.Networking = class Networking {
             } else {
                 // This online player recently joined and is not in the onlinePlayer array
                 // Therefore create a new entry for him in the array
-                this.game.onlinePlayer[playerId] = new Player(this.game.assetLoader.sprites["player1"], targetPlayerState.p.x, targetPlayerState.p.y)
+
+                // this.game.onlinePlayer[playerId] = new Player(this.game.assetLoader.sprites["player1"], targetPlayerState.p.x, targetPlayerState.p.y)
             }
         }
     }
@@ -181,14 +183,33 @@ module.exports.Networking = class Networking {
     //////////////////////////////////////////
     // *--   Connection Event Handler   --* //
 
+    onConnect(payload) {
+        // Send initial Data on connection
+        this.socket.emit("id", { pn: this.game.character.playerName});
+    }
+
     onServerConnect(payload) {
         this.socket.userid = payload.id;
         this.game.ui.displayVersions(this.game.config.clientVersion, payload.v);
         this.networkStatus.innerHTML = "Connected";
+        this.networkStatus.innerHTML = payload.l;
+
+        // init all online player
+        for (let playerId in payload.p) {
+            if (!this.game.onlinePlayer.hasOwnProperty(playerId)
+             && payload.p.hasOwnProperty(playerId)
+             && this.socket.userid !== playerId) {
+                let newPlayer = payload.p[playerId];
+                this.game.onlinePlayer[playerId] = new Player(this.game.assetLoader.sprites["player1"], newPlayer.p.x, newPlayer.p.y, newPlayer.pn)
+            }
+        }
     }
 
     onRoomConnect(payload) {
-        this.networkStatus.innerHTML = payload.room;
+        // here we get notified of the new players initial data like playername
+        if (!this.game.onlinePlayer.hasOwnProperty(payload.newPlayer.id)) {
+            this.game.onlinePlayer[payload.newPlayer.id] = new Player(this.game.assetLoader.sprites["player1"], payload.newPlayer.p.x, payload.newPlayer.p.y, payload.newPlayer.pn)
+        }
     }
 
     onServerDisconnect() {
