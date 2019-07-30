@@ -6,6 +6,8 @@ const { AssetLoader } = require("./assetLoader");
 const { InputHandler } = require("./inputHandler");
 const { CollisionDetection } = require("./collisionDetection");
 const { Camera } = require("./camera");
+const { GameObject } = require("./gameObject.js");
+const {SpriteInterpreter } = require("./spriteInterpreter.js");
 
 const config = require("./config.json");
 
@@ -20,14 +22,15 @@ module.exports.Game = class Game {
 
         this.camera = new Camera();
         this.map = {};
-        this.objects = [];
-        this.character = {};
+        this.objects = [];                                  
+        this.character = {};                    
         this.onlinePlayer = {};
         this.networking = {};
         this.inputHandler = {};
         this.collisionDetection = {};
         this.assetLoader = new AssetLoader();
         this.debugShow = false;
+        this.delay = 0;
         this.config = config;
 
         this.ui.onPlay = this.start.bind(this);
@@ -81,6 +84,31 @@ module.exports.Game = class Game {
         }
     }
 
+    projectile() {
+        let projectileStartX = this.character.position.x +20;
+        let projectileStartY = this.character.position.y +10; 
+        
+        
+        let spriteInterpreter = new SpriteInterpreter(this.assetLoader.sprites["ball"], 1, 0, 7, 4, 2, 0, 0, 10);
+        this.objects.push(new GameObject(spriteInterpreter, projectileStartX, projectileStartY));
+        let projectileVelocity = this.objects[this.objects.length -1].velocity;
+        let projectileSpeed = 6;
+
+        if(this.character.velocity.x > 0){
+            projectileVelocity.x = projectileSpeed;
+        } else if(this.character.velocity.x < 0){
+            projectileVelocity.x = -projectileSpeed;
+        };
+        if(this.character.velocity.y > 0){
+            projectileVelocity.y = projectileSpeed;
+        } else if(this.character.velocity.y < 0){
+            projectileVelocity.y = -projectileSpeed;
+        };
+        if(this.character.velocity.x === 0 && this.character.velocity.y === 0){
+            projectileVelocity.y = projectileSpeed;
+        };
+};
+
     // initialize Gameobject like map, the character, inputhandler, ...
     initializeGameObjects(playerName) {
         this.map = new Map(this.assetLoader.mapLayouts["mainLobby"], this.assetLoader.sprites["mainLobby"], 240, 24, 10);
@@ -94,7 +122,8 @@ module.exports.Game = class Game {
 
         this.inputHandler = new InputHandler(this.character, this);
         this.collisionDetection = new CollisionDetection([...this.map.colliders]);
-        this.character.setCollisionDetectionObject(this.collisionDetection);
+        this.character.setCollisionDetectionObject(this.collisionDetection);                                                   
+        
     }
 
     // draw map, character, objects and onlinePlayer
@@ -112,7 +141,7 @@ module.exports.Game = class Game {
             let object = this.objects[i];
             object.draw(this.ctxForeground);
         }
-        this.character.draw(this.ctxForeground);
+        this.character.draw(this.ctxForeground);                                                 
         
         if(this.debugShow === true){
             for (var i = 0; i < this.collisionDetection.colliders.length; i++) {
@@ -133,8 +162,12 @@ module.exports.Game = class Game {
 
     // update the positions of all objects
     update(timePassed) {
-        this.inputHandler.handleInput(timePassed);
-        let inputStateForServer = this.inputHandler.prepareAndReturnInputStateForServer();
+        if (this.inputHandler.inputState.keysDown.includes("Space") && this.networking.clientTime > this.delay + 0.2){
+            this.delay = this.networking.clientTime;
+            this.projectile();
+        };
+        this.inputHandler.handleInput(timePassed);                                                      
+        let inputStateForServer = this.inputHandler.prepareAndReturnInputStateForServer();              
         this.networking.sendInput(inputStateForServer);
 
         for (let i = 0; i < this.objects.length; i++) {

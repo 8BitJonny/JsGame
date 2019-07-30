@@ -1,7 +1,7 @@
 const { Vector } = require("./vector");
 
 module.exports.GameObject = class GameObject {
-    constructor(spriteInterpreter, x, y) {
+    constructor(spriteInterpreter, x, y) {                      
         this.spriteInterpreter = spriteInterpreter;
         this.position = new Vector(x,y);
         this.velocity = new Vector(0,0);
@@ -19,7 +19,7 @@ module.exports.GameObject = class GameObject {
 
     };
 
-    draw(ctx) {
+    draw(ctx) {                                                                             
         ctx.save();
         ctx.translate(this.position.x, this.position.y);
 
