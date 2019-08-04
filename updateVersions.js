@@ -8,8 +8,10 @@ if (buildNumber === undefined) {
     return
 }
 
-if (typeof buildNumber !== "number" || buildNumber.split(".").length !== 1) {
-    console.log("Error: the provided version number is not a valid number")
+if (typeof parseInt(buildNumber) !== "number" || buildNumber.split(".").length !== 1) {
+    console.log(typeof buildNumber);
+    console.log(buildNumber.split(".").length);
+    console.log("Error: the provided version number '",buildNumber, "' is not a valid number")
 }
 
 const jsonFiles = [
@@ -31,14 +33,14 @@ const jsonFiles = [
     ]
 ];
 
-for (let fileData in jsonFiles) {
+jsonFiles.forEach(function(fileData) {
     let filePath = fileData[0];
     let jsonFileKey = fileData[1];
 
     let data = require('./' + filePath);
     let lastVersion = data[jsonFileKey];
-    let majorMinorVersion = lastVersion.split(".").slice(0,1);
-    let newVersion = majorMinorVersion + '.' + buildNumber;
+    let majorMinorVersion = lastVersion.split(".").slice(0,2);
+    let newVersion = majorMinorVersion.join(".") + '.' + buildNumber;
     data[jsonFileKey] = newVersion;
 
     // write it to the file
@@ -47,7 +49,7 @@ for (let fileData in jsonFiles) {
             return console.log(err);
         }
 
-        console.log("The file: ", filePath, " was successfully saved!");
+        console.log("The file: ", filePath, " was successfully saved with the new version of: ", newVersion);
     });
-}
+});
 
