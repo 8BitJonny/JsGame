@@ -41,9 +41,9 @@ jobs:
       - run: pwd
 
       - persist_to_workspace:
-          root: ~
+          root: ~/repo
           paths:
-            - ./*
+            - /*
 
   publish:
     docker:
