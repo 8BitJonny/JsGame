@@ -30,13 +30,13 @@ jobs:
 
       # updateVersion !
       - run:
-        - name: Set Build version in all version files
-        - command: node updateVersions.js $CIRCLE_BUILD_NUM
+          name: Set Build version in all version files
+          command: node updateVersions.js $CIRCLE_BUILD_NUM
 
       # build client!
       - run:
-          - name: Build Client files
-          - command: yarn run build_client
+          name: Build Client files
+          command: yarn run build_client
 
 workflows:
   version: 2
