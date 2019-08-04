@@ -29,7 +29,7 @@ jobs:
           key: v1-dependencies-{{ checksum "package.json" }}
 
       # updateVersion !
-      - run: updateVersions.js $CIRCLE_BUILD_NUM
+      - run: node updateVersions.js $CIRCLE_BUILD_NUM
 
       - run: cat package.json
 
