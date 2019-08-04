@@ -29,14 +29,14 @@ jobs:
           key: v1-dependencies-{{ checksum "package.json" }}
 
       # updateVersion !
-      - run: node updateVersions.js $CIRCLE_BUILD_NUM
-
-      - run: cat package.json
-
-      - run: cat server/config.json
+      - run:
+        - name: Set Build version in all version files
+        - command: node updateVersions.js $CIRCLE_BUILD_NUM
 
       # build client!
-      - run: yarn run build_client
+      - run:
+          - name: Build Client files
+          - command: yarn run build_client
 
 workflows:
   version: 2
