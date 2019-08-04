@@ -38,10 +38,35 @@ jobs:
           name: Build Client files
           command: yarn run build_client
 
+      - run: pwd
+
+      - persist_to_workspace:
+          root: ~
+          paths:
+            - *
+
+  publish:
+    docker:
+      # specify the version you desire here
+      - image: buildpack-deps:trusty
+
+    working_directory: ~/repo
+
+    steps:
+      - attach_workspace:
+          at: ~/repo
+
+      - run: ls -la
+
+      - run: pwd
+
 workflows:
   version: 2
   build_updateVersion_and_publish:
     jobs:
       - build
+      - publish:
+          requires:
+            - build
 
 
