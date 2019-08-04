@@ -9,7 +9,7 @@ const { Camera } = require("./camera");
 const { GameObject } = require("./gameObject.js");
 const {SpriteInterpreter } = require("./spriteInterpreter.js");
 
-const config = require("./config.json");
+const config = require("../config.json");
 
 module.exports.Game = class Game {
     constructor() {

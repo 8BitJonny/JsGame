@@ -30,3 +30,14 @@ jobs:
 
       # build client!
       - run: yarn run build_client
+
+  updateVersion:
+    docker:
+      - image: circleci/node:8.11.2
+
+    steps:
+      - run: updateVersions.js $CIRCLE_BUILD_NUM
+
+      - run: cat package.json
+
+      - run: cat server/config.json
