@@ -60,11 +60,17 @@ jobs:
       - attach_workspace:
           at: ~/repo
 
-      - run: cat package.json
-
       - run:
           name: Add Fingerprint
           command: echo $FINGERPRINT >> ~/.ssh/known_hosts
+
+      - run:
+          name: Remove Toplevel NodeModules
+          command: rm -R ~/repo/node_modules
+
+      - run:
+          name: Remove Client NodeModules
+          command: rm -R ~/repo/client/node_modules
 
       - run:
           name: Git Push to Deploy
