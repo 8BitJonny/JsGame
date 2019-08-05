@@ -65,16 +65,16 @@ jobs:
           command: echo $FINGERPRINT >> ~/.ssh/known_hosts
 
       - run:
-          name: Remove Toplevel NodeModules
-          command: rm -R ~/repo/node_modules
-
-      - run:
-          name: Remove Client NodeModules
-          command: rm -R ~/repo/client/node_modules
+          name: Create VersionCommit
+          command: |
+            git status
+            git add .
+            git commit -m 'Bump version'
+            git log --oneline -5g
 
       - run:
           name: Git Push to Deploy
-          command: scp -r ~/repo/* pi@31.16.191.122:/var/www/html/play-pago.com/
+          command: git push ssh://pi@31.16.191.122/var/Pago/site.git master --force
 
       - run:
           name: PM2 restart
