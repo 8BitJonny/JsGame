@@ -63,8 +63,12 @@ jobs:
       - run: cat package.json
 
       - run:
+          name: Add Fingerprint
+          command: echo $FINGERPRINT >> ~/.ssh/known_hosts
+
+      - run:
           name: Git Push to Deploy
-          command: git push ssh://pi@31.16.191.122/var/Pago/site.git
+          command: git push ssh://pi@31.16.191.122/var/Pago/site.git master
 
       - run:
           name: PM2 restart
