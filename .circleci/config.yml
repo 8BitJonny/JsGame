@@ -1,0 +1,85 @@
+# Javascript Node CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-javascript/ for more details
+#
+version: 2
+jobs:
+  build:
+    docker:
+      # specify the version you desire here
+      - image: circleci/node:8.11.2
+
+    working_directory: ~/repo
+
+    steps:
+      - checkout
+
+      # Download and cache dependencies
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "package.json" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
+
+      - run: yarn install
+
+      - save_cache:
+          paths:
+            - node_modules
+          key: v1-dependencies-{{ checksum "package.json" }}
+
+      # updateVersion !
+      - run:
+          name: Set Build version in all version files
+          command: node updateVersions.js $CIRCLE_BUILD_NUM
+
+      # build client!
+      - run:
+          name: Build Client files
+          command: yarn run build_client
+
+      - run: pwd
+
+      - persist_to_workspace:
+          root: ~/repo
+          paths:
+            - ./*
+
+  publish:
+    docker:
+      # specify the version you desire here
+      - image: buildpack-deps:trusty
+
+    working_directory: ~/repo
+
+    steps:
+      - add_ssh_keys:
+          fingerprints:
+            - "34:0d:3f:ff:90:96:a0:c0:91:49:9a:9d:84:e4:c6:69"
+
+      - attach_workspace:
+          at: ~/repo
+
+      - run: cat package.json
+
+      - run:
+          name: Git Push to Deploy
+          command: git push ssh://pi@31.16.191.122/var/Pago/site.git
+
+      - run:
+          name: PM2 restart
+          command: ssh pi@31.16.191.122 'pm2 restart all'
+
+workflows:
+  version: 2
+  build_updateVersion_and_publish:
+    jobs:
+      - build
+      - publish:
+          requires:
+            - build
+          filters:
+            branches:
+              only: master
+
+
