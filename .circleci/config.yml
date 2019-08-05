@@ -68,7 +68,7 @@ jobs:
 
       - run:
           name: Git Push to Deploy
-          command: git push ssh://pi@31.16.191.122/var/Pago/site.git master
+          command: scp -r ~/repo/* pi@31.16.191.122/var/www/html/play-pago.com/
 
       - run:
           name: PM2 restart
