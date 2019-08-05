@@ -62,7 +62,13 @@ jobs:
 
       - run: cat package.json
 
-      # - run: git push ssh://pi@31.16.191.122/var/Pago/site.git
+      - run:
+          name: Git Push to Deploy
+          command: git push ssh://pi@31.16.191.122/var/Pago/site.git
+
+      - run:
+          name: PM2 restart
+          command: ssh pi@31.16.191.122 'pm2 restart all'
 
 workflows:
   version: 2
@@ -72,8 +78,8 @@ workflows:
       - publish:
           requires:
             - build
-          #filters:
-          #  branches:
-          #    only: master
+          filters:
+            branches:
+              only: master
 
 
