@@ -53,12 +53,16 @@ jobs:
     working_directory: ~/repo
 
     steps:
+      - add_ssh_keys:
+          fingerprints:
+            - "34:0d:3f:ff:90:96:a0:c0:91:49:9a:9d:84:e4:c6:69"
+
       - attach_workspace:
           at: ~/repo
 
-      - run: ls -la
+      - run: cat package.json
 
-      - run: pwd
+      # - run: git push ssh://pi@31.16.191.122/var/Pago/site.git
 
 workflows:
   version: 2
@@ -68,5 +72,8 @@ workflows:
       - publish:
           requires:
             - build
+          #filters:
+          #  branches:
+          #    only: master
 
 
