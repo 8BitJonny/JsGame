@@ -67,6 +67,8 @@ jobs:
       - run:
           name: Create VersionCommit
           command: |
+            git config --global user.email "info@play-pago.com"
+            git config --global user.name "CircleCI"
             git status
             git add .
             git commit -m 'Bump version'
