@@ -36,6 +36,8 @@ A fun little web based game written in plain Javascript.
 
 See also the list of [contributors](https://github.com/code-smartchain) who participated in this project.
 
+ **Start: 14.06.19**
+
 ## License
 
 This project is licensed under the GNU General Public License v3.0
