@@ -5,6 +5,7 @@ module.exports.GameObject = class GameObject {
         this.spriteInterpreter = spriteInterpreter;
         this.position = new Vector(x,y);
         this.velocity = new Vector(0,0);
+        this.toBeDeleted = false;
 
         let shapeWidth = this.spriteInterpreter != null ? this.spriteInterpreter.shapeWidth : 0;
         let shapeHeight = this.spriteInterpreter != null ? this.spriteInterpreter.shapeHeight : 0;

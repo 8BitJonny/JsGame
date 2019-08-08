@@ -107,15 +107,15 @@ module.exports.Player = class Player extends GameObject {
             this.facingDirection = 0;
         } else if (newVelocity.x === 0) {
             if (newVelocity.y < 0) {
-                this.facingDirection = 1;       //up
+                this.facingDirection = 1;
             } else {
-                this.facingDirection = 3;       //down
+                this.facingDirection = 3;
             }
         } else if (newVelocity.y === 0) {
             if (newVelocity.x < 0) {
-                this.facingDirection = 4;       //left
+                this.facingDirection = 4;
             } else {
-                this.facingDirection = 2;       //right
+                this.facingDirection = 2;
             }
         } else {
             if (newVelocity.x < 0) {
