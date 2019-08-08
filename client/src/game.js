@@ -7,7 +7,8 @@ const { InputHandler } = require("./inputHandler");
 const { CollisionDetection } = require("./collisionDetection");
 const { Camera } = require("./camera");
 const { GameObject } = require("./gameObject.js");
-const {SpriteInterpreter } = require("./spriteInterpreter.js");
+const { SpriteInterpreter } = require("./spriteInterpreter.js");
+const { Projectile } = require("./projectile.js");
 
 const config = require("../config.json");
 
@@ -84,7 +85,7 @@ module.exports.Game = class Game {
         }
     }
 
-    projectile() {
+    /*projectile() {
         let projectileStartX = this.character.position.x +20;
         let projectileStartY = this.character.position.y +10; 
         
@@ -107,7 +108,7 @@ module.exports.Game = class Game {
         if(this.character.velocity.x === 0 && this.character.velocity.y === 0){
             projectileVelocity.y = projectileSpeed;
         };
-};
+    };*/
 
     // initialize Gameobject like map, the character, inputhandler, ...
     initializeGameObjects(playerName) {
@@ -164,7 +165,8 @@ module.exports.Game = class Game {
     update(timePassed) {
         if (this.inputHandler.inputState.keysDown.includes("Space") && this.networking.clientTime > this.delay + 0.2){
             this.delay = this.networking.clientTime;
-            this.projectile();
+            let projectile = new Projectile(this);
+            projectile.spawn(); 
         };
         this.inputHandler.handleInput(timePassed);                                                      
         let inputStateForServer = this.inputHandler.prepareAndReturnInputStateForServer();              
