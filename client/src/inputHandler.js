@@ -10,6 +10,7 @@ module.exports.InputHandler = class InputHandler{
         this.inputHistory = [];
 
         document.addEventListener("keydown",event => {
+            // Movement keys
             switch(event.code) {
                 case "KeyW":
                 case "KeyA":
@@ -20,9 +21,19 @@ module.exports.InputHandler = class InputHandler{
                 case "ArrowLeft":
                 case "ArrowRight":
                 case "Space":
+                    if (this.game.gamePaused) {
+                        // If game is paused, ignore movement input
+                        return
+                    }
+
                     if(!this.inputState.keysDown.includes(event.code)){
                         this.inputState.keysDown.unshift(event.code);
                     }
+            }
+
+            // Pause Key
+            if (event.code === "Escape") {
+                this.game.onPause();
             }
         });
         document.addEventListener("keyup",event => {

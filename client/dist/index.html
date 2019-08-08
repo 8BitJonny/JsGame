@@ -42,10 +42,8 @@
                 z-index: 10;
                 color: white;
             }
-            #startScreen {
-                flex-direction: column;
-            }
             .fullScreen {
+                flex-direction: column;
                 justify-content: center;
                 align-items: center;
                 width: 100%;
@@ -53,6 +51,14 @@
                 z-index: 10;
                 display: flex;
                 position: absolute;
+            }
+            .center {
+                text-align: center;
+                align-items: center;
+                justify-content: center;
+            }
+            .menu-btn {
+                width: 160px;
             }
             .butn {
                 -webkit-border-radius: 0;
@@ -118,7 +124,13 @@
             <span>Client version: <span id="clientVersion">/</span></span><br>
             <span>Server version: <span id="serverVersion">/</span></span><br>
         </div>
-        <div id="loadingAssets" class="fullScreen b-black">
+        <div id="pauseScreen" class="fullScreen b-black center" style="opacity: 0.7; display: none">
+            <h1 class="f-white">Pause</h1><br>
+            <button id="resumeGameBtn" class="butn menu-btn f-white b-black" type="submit">Resume</button><br>
+            <button id="settingsBtn" class="butn menu-btn f-white b-black" type="submit">Settings</button><br>
+            <button id="exitGameBtn" class="butn menu-btn f-white b-black" type="submit">Exit</button><br>
+        </div>
+        <div id="loadingAssets" class="fullScreen b-black center">
             <p id="loadingMessage" class="f-white">Loading ...</p>
         </div>
         <div id="startScreen" class="fullScreen b-black">

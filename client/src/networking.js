@@ -120,8 +120,8 @@ module.exports.Networking = class Networking {
 
         // Error because we didn't find the previous and next server update
         if (!previous || !target) {
-            console.error("shouldn happen: \n Client Time: ", this.clientTime, " \n point time: ", a, " \ next time: ", b );
-            console.error(debug);
+            //console.error("shouldn happen: \n Client Time: ", this.clientTime, " \n point time: ", a, " \ next time: ", b );
+            //console.error(debug);
             previous = this.serverUpdates[0];
             target = this.serverUpdates[0];
         }
