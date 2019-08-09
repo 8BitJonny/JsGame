@@ -18,6 +18,7 @@ module.exports.Game = class Game {
         this.ctxBackground = {};
 
         this.lastFrameTime = 0;
+        this.gamePaused = false;
 
         this.ui = new UI();
 
@@ -33,7 +34,9 @@ module.exports.Game = class Game {
         this.debugShow = false;
         this.config = config;
 
-        this.ui.onPlay = this.start.bind(this);
+        this.ui.onGameStart = this.start.bind(this);
+        this.ui.onGameResume = this.onPause.bind(this);
+        this.ui.onGameExit = this.onExit.bind(this)
     };
     
     // start game
@@ -45,9 +48,24 @@ module.exports.Game = class Game {
         this.waitForLoadedAssetsAndStart(playerName);
     }
 
+    // pause game
+    onPause() {
+        this.gamePaused = !this.gamePaused;
+        if (this.gamePaused) {
+            this.inputHandler.inputState.keysDown = [];
+            this.ui.drawPauseScreen();
+        } else {
+            this.ui.hidePauseScreen();
+        }
+    }
+
+    onExit() {
+        location.reload();
+    }
+
     // setup canvas
     setupCanvas() {
-        this.ui.addAutoResizeCanvas();
+        this.ui.addWindowEventListener(this.onPause.bind(this));
 
         this.ctxForeground = this.ui.cfg.getContext("2d");
         this.ctxForeground.imageSmoothingEnabled = false;
@@ -112,7 +130,7 @@ module.exports.Game = class Game {
         this.map.drawForeground(this.ctxForeground);
         this.map.drawBackground(this.ctxBackground);
         
-        for (var i = 0; i < this.objects.length; i++) {
+        for (let i = 0; i < this.objects.length; i++) {
             let object = this.objects[i];
             object.draw(this.ctxForeground);
         }
