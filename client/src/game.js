@@ -13,9 +13,7 @@ const { Projectile } = require("./projectile.js");
 const config = require("../config.json");
 
 module.exports.Game = class Game {
-    constructor() {
-        this.PROJECTILE_CD = 0.2;
-        
+    constructor() {        
         this.ctxForeground = {};
         this.ctxBackground = {};
 
@@ -33,7 +31,6 @@ module.exports.Game = class Game {
         this.collisionDetection = {};
         this.assetLoader = new AssetLoader();
         this.debugShow = false;
-        this.lastProjectile = 0;
         this.config = config;
 
         this.ui.onPlay = this.start.bind(this);
@@ -140,11 +137,6 @@ module.exports.Game = class Game {
 
     // update the positions of all objects
     update(timePassed) {
-        if (this.inputHandler.inputState.keysDown.includes("Space") && this.networking.clientTime > this.lastProjectile + this.PROJECTILE_CD){
-            this.lastProjectile = this.networking.clientTime;
-            let projectile = new Projectile(this);
-            projectile.spawn(); 
-        };
         this.inputHandler.handleInput(timePassed);                                                      
         let inputStateForServer = this.inputHandler.prepareAndReturnInputStateForServer();              
         this.networking.sendInput(inputStateForServer);
@@ -153,7 +145,7 @@ module.exports.Game = class Game {
             let object = this.objects[i];
             
             if (object instanceof Projectile) {
-                object.checkforDeletion();
+                object.checkforDeletion(this.networking.clientTime);
             }
             if (this.objects[i].toBeDeleted === true){
                 this.objects.splice(i,1);

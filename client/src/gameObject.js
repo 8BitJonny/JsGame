@@ -17,7 +17,6 @@ module.exports.GameObject = class GameObject {
 
         // all gameObjects that are children's of this gameObjects and are rendered relative to the parent
         this.children = []
-
     };
 
     draw(ctx) {                                                                             

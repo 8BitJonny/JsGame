@@ -3,6 +3,7 @@ const { TextDrawer } = require("./textDrawer");
 const { SpriteInterpreter } = require("./spriteInterpreter");
 const { Vector } = require("./vector");
 const { CollisionDetection } = require("./collisionDetection");
+const { Projectile } = require("./projectile.js");
 
 module.exports.Player = class Player extends GameObject {
     constructor(imgSprite,x,y,playerName){
@@ -130,6 +131,11 @@ module.exports.Player = class Player extends GameObject {
         }
 
         this.velocity = newVelocity;
+    };
+
+    shootProjectile(timeOfCreation, sprite, objects) {
+        let projectile = new Projectile(this, timeOfCreation, sprite, objects);
+        projectile.spawn();
     };
 
     stopMovement() {
