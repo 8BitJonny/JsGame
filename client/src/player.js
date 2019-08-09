@@ -3,6 +3,7 @@ const { TextDrawer } = require("./textDrawer");
 const { SpriteInterpreter } = require("./spriteInterpreter");
 const { Vector } = require("./vector");
 const { CollisionDetection } = require("./collisionDetection");
+const { Projectile } = require("./projectile.js");
 
 module.exports.Player = class Player extends GameObject {
     constructor(imgSprite,x,y,playerName){
@@ -107,15 +108,15 @@ module.exports.Player = class Player extends GameObject {
             this.facingDirection = 0;
         } else if (newVelocity.x === 0) {
             if (newVelocity.y < 0) {
-                this.facingDirection = 1;       //up
+                this.facingDirection = 1;
             } else {
-                this.facingDirection = 3;       //down
+                this.facingDirection = 3;
             }
         } else if (newVelocity.y === 0) {
             if (newVelocity.x < 0) {
-                this.facingDirection = 4;       //left
+                this.facingDirection = 4;
             } else {
-                this.facingDirection = 2;       //right
+                this.facingDirection = 2;
             }
         } else {
             if (newVelocity.x < 0) {
@@ -130,6 +131,11 @@ module.exports.Player = class Player extends GameObject {
         }
 
         this.velocity = newVelocity;
+    };
+
+    shootProjectile(timeOfCreation, sprite, objects) {
+        let projectile = new Projectile(this, timeOfCreation, sprite, objects);
+        projectile.spawn();
     };
 
     stopMovement() {
