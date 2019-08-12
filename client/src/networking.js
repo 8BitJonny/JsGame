@@ -200,7 +200,7 @@ module.exports.Networking = class Networking {
              && payload.p.hasOwnProperty(playerId)
              && this.socket.userid !== playerId) {
                 let newPlayer = payload.p[playerId];
-                this.game.onlinePlayer[playerId] = new Player(this.game.assetLoader.sprites["player1"], newPlayer.p.x, newPlayer.p.y, newPlayer.pn)
+                this.game.onlinePlayer[playerId] = new Player(this.game.assetLoader.sprites["player2"], newPlayer.p.x, newPlayer.p.y, newPlayer.pn)
             }
         }
     }
@@ -208,7 +208,7 @@ module.exports.Networking = class Networking {
     onRoomConnect(payload) {
         // here we get notified of the new players initial data like playername
         if (!this.game.onlinePlayer.hasOwnProperty(payload.newPlayer.id)) {
-            this.game.onlinePlayer[payload.newPlayer.id] = new Player(this.game.assetLoader.sprites["player1"], payload.newPlayer.p.x, payload.newPlayer.p.y, payload.newPlayer.pn)
+            this.game.onlinePlayer[payload.newPlayer.id] = new Player(this.game.assetLoader.sprites["player2"], payload.newPlayer.p.x, payload.newPlayer.p.y, payload.newPlayer.pn)
         }
     }
 
