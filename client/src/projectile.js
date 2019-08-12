@@ -14,7 +14,6 @@ module.exports.Projectile = class Projectile extends GameObject{
         this.timeOfCreation = timeOfCreation;
         this.character = character;
         this.projectileVelocity = this.velocity;
-        this.characterVelo = this.character.velocity;
         this.lastInputID = -1;
         this.inputHistory = [];
         this.pressedKeys = pressedKeys;
