@@ -7,10 +7,10 @@ const { Projectile } = require("./projectile.js");
 
 module.exports.Player = class Player extends GameObject {
     constructor(imgSprite,x,y,playerName){
-        let PADDINGX = 34;
+        let PADDINGX = 42;
         let PADDINGY = 10;
         let SCALE = 1;
-        let spriteInterpreter = imgSprite != null ? new SpriteInterpreter(imgSprite, SCALE, 18, 0, 9, 4, PADDINGX, PADDINGY) : null;
+        let spriteInterpreter = imgSprite != null ? new SpriteInterpreter(imgSprite, SCALE, 0, 0, 4, 4, PADDINGX, PADDINGY) : null;
 
         super(spriteInterpreter, x, y);
         this.SCALE = SCALE;
@@ -24,10 +24,10 @@ module.exports.Player = class Player extends GameObject {
         this.facingDirection = 0;
         this.spriteInterpreterList = [
             spriteInterpreter,
-            imgSprite != null ? new SpriteInterpreter(imgSprite, this.SCALE,  1, 7, 9, 4, PADDINGX, PADDINGY, 10) : null,
-            imgSprite != null ? new SpriteInterpreter(imgSprite, this.SCALE, 27, 7, 9, 4, PADDINGX, PADDINGY, 10) : null,
-            imgSprite != null ? new SpriteInterpreter(imgSprite, this.SCALE, 19, 7, 9, 4, PADDINGX, PADDINGY, 10) : null,
-            imgSprite != null ? new SpriteInterpreter(imgSprite, this.SCALE,  9, 7, 9, 4, PADDINGX, PADDINGY, 10) : null
+            imgSprite != null ? new SpriteInterpreter(imgSprite, this.SCALE,  5, 2, 4, 4, PADDINGX, PADDINGY, 10) : null,
+            imgSprite != null ? new SpriteInterpreter(imgSprite, this.SCALE,  9, 2, 4, 4, PADDINGX, PADDINGY, 10) : null,
+            imgSprite != null ? new SpriteInterpreter(imgSprite, this.SCALE,  1, 2, 4, 4, PADDINGX, PADDINGY, 10) : null,
+            imgSprite != null ? new SpriteInterpreter(imgSprite, this.SCALE, 13, 2, 4, 4, PADDINGX, PADDINGY, 10) : null
         ];
 
         this.collisionDetection = null;

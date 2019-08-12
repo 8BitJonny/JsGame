@@ -13,11 +13,13 @@ module.exports.AssetLoader = class AssetLoader {
     }
 
     loadAssets() {
+        const Player2 = require("../img/Charakter01.png");
         const Player1 = require("../img/BODY_skeleton.png");
         const Map1 = require("../img/dungeon_sheet.png");
         const Ball = require("../img/flames.png");
 
         this.sprites["player1"] = this._imageForPath(Player1);
+        this.sprites["player2"] = this._imageForPath(Player2);
         this.sprites["mainLobby"] = this._imageForPath(Map1);
         this.sprites["ball"] = this._imageForPath(Ball);
 

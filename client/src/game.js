@@ -105,7 +105,7 @@ module.exports.Game = class Game {
     // initialize Gameobject like map, the character, inputhandler, ...
     initializeGameObjects(playerName) {
         this.map = new Map(this.assetLoader.mapLayouts["mainLobby"], this.assetLoader.sprites["mainLobby"], 240, 24, 10);
-        this.character = new Player(this.assetLoader.sprites["player1"], 100, 100, playerName);
+        this.character = new Player(this.assetLoader.sprites["player2"], 100, 100, playerName);
 
         window.addEventListener("resize", () => {
             this.ctxForeground.imageSmoothingEnabled = false;
