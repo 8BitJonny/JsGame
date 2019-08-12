@@ -75,7 +75,7 @@ module.exports.Player = class Player extends GameObject {
             this.velocity = new Vector(0, 0);
             return
         }
-
+        
         const newVelocity = new Vector(0, 0);
         let oldFacingDirection = this.facingDirection;
 

@@ -2,7 +2,7 @@ const { GameObject } = require("./gameObject.js");
 const { SpriteInterpreter } = require("./spriteInterpreter.js");
 
 module.exports.Projectile = class Projectile extends GameObject{
-    constructor(character, timeOfCreation, sprite, objects, pressedKeys ) {
+    constructor(character, timeOfCreation, sprite, objects, pressedKeys) {
         let projectileStartX = character.position.x +20;
         let projectileStartY = character.position.y +10;
         
