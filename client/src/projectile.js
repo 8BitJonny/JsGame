@@ -31,7 +31,7 @@ module.exports.Projectile = class Projectile extends GameObject{
         } 
     }
     checkforDeletion(clientTime) {
-        if (clientTime > this.timeOfCreation + this.LIFESPAN || (this.projectileVelocity.x === 0 && this.projectileVelocity.y === 0)){
+        if (clientTime > this.timeOfCreation + this.LIFESPAN){
             this.toBeDeleted = true;
         }
     }
