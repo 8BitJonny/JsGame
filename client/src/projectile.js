@@ -14,14 +14,11 @@ module.exports.Projectile = class Projectile extends GameObject{
         this.timeOfCreation = timeOfCreation;
         this.character = character;
         this.projectileVelocity = this.velocity;
-        this.characterVelo = this.character.velocity;
-        this.lastInputID = -1;
-        this.inputHistory = [];
         this.pressedKeys = pressedKeys;
     }
     spawn() {
         this.objects.push(this);
-        if(this.pressedKeys.includes("KeyW")) {
+        if (this.pressedKeys.includes("KeyW")) {
             this.projectileVelocity.y = - this.PROJECTILESPEED;
         } else if (this.pressedKeys.includes("KeyS")) {
             this.projectileVelocity.y = this.PROJECTILESPEED;
@@ -29,10 +26,13 @@ module.exports.Projectile = class Projectile extends GameObject{
             this.projectileVelocity.x = - this.PROJECTILESPEED;
         } else if (this.pressedKeys.includes("KeyD")) {
             this.projectileVelocity.x = this.PROJECTILESPEED;
-        } 
+        }
+        if (this.pressedKeys.length === 1) {
+            this.projectileVelocity.y = this.PROJECTILESPEED;
+        }
     }
     checkforDeletion(clientTime) {
-        if (clientTime > this.timeOfCreation + this.LIFESPAN || (this.projectileVelocity.x === 0 && this.projectileVelocity.y === 0)){
+        if (clientTime > this.timeOfCreation + this.LIFESPAN){
             this.toBeDeleted = true;
         }
     }

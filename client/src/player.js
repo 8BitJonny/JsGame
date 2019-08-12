@@ -85,7 +85,6 @@ module.exports.Player = class Player extends GameObject {
                 continue
             }
 
-
             const input = this.inputHistory[inputIndex];
             for (let keyIndex = 0; keyIndex < input.keysDown.length; keyIndex++) {
 
