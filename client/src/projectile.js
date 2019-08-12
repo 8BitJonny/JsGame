@@ -2,7 +2,7 @@ const { GameObject } = require("./gameObject.js");
 const { SpriteInterpreter } = require("./spriteInterpreter.js");
 
 module.exports.Projectile = class Projectile extends GameObject{
-    constructor(character, timeOfCreation, sprite, objects ) {
+    constructor(character, timeOfCreation, sprite, objects, pressedKeys ) {
         let projectileStartX = character.position.x +20;
         let projectileStartY = character.position.y +10;
         
@@ -13,30 +13,26 @@ module.exports.Projectile = class Projectile extends GameObject{
         this.objects = objects;
         this.timeOfCreation = timeOfCreation;
         this.character = character;
-        console.log(character);
-        
+        this.projectileVelocity = this.velocity;
+        this.characterVelo = this.character.velocity;
+        this.lastInputID = -1;
+        this.inputHistory = [];
+        this.pressedKeys = pressedKeys;
     }
     spawn() {
         this.objects.push(this);
-        let projectileVelocity = this.velocity;
-        let characterVelo = this.character.velocity;
-
-        if(characterVelo.x > 0){
-            projectileVelocity.x = this.PROJECTILESPEED;
-        } else if(characterVelo.x < 0){
-            projectileVelocity.x = -this.PROJECTILESPEED;
-        };
-        if(characterVelo.y > 0){
-            projectileVelocity.y = this.PROJECTILESPEED;
-        } else if(characterVelo.y < 0){
-            projectileVelocity.y = -this.PROJECTILESPEED;
-        };
-        if(characterVelo.x === 0 && characterVelo.y === 0){
-            projectileVelocity.y = this.PROJECTILESPEED;
-        };
+        if(this.pressedKeys.includes("KeyW")) {
+            this.projectileVelocity.y = - this.PROJECTILESPEED;
+        } else if (this.pressedKeys.includes("KeyS")) {
+            this.projectileVelocity.y = this.PROJECTILESPEED;
+        } if (this.pressedKeys.includes("KeyA")) {
+            this.projectileVelocity.x = - this.PROJECTILESPEED;
+        } else if (this.pressedKeys.includes("KeyD")) {
+            this.projectileVelocity.x = this.PROJECTILESPEED;
+        } 
     }
     checkforDeletion(clientTime) {
-        if (clientTime > this.timeOfCreation + this.LIFESPAN){
+        if (clientTime > this.timeOfCreation + this.LIFESPAN || (this.projectileVelocity.x === 0 && this.projectileVelocity.y === 0)){
             this.toBeDeleted = true;
         }
     }

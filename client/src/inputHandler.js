@@ -58,7 +58,7 @@ module.exports.InputHandler = class InputHandler{
 
         if (this.inputState.keysDown.includes("Space") && this.game.networking.clientTime > this.lastProjectile + this.PROJECTILE_CD){
             this.lastProjectile = this.game.networking.clientTime;
-            this.player.shootProjectile(this.game.networking.clientTime, this.game.assetLoader.sprites["ball"],this.game.objects);
+            this.player.shootProjectile(this.game.networking.clientTime, this.game.assetLoader.sprites["ball"],this.game.objects,this.inputState.keysDown);
         }
         this.inputHistory.push({
             stateIndex: this.inputState.stateIndex,

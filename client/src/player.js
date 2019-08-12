@@ -133,8 +133,8 @@ module.exports.Player = class Player extends GameObject {
         this.velocity = newVelocity;
     };
 
-    shootProjectile(timeOfCreation, sprite, objects) {
-        let projectile = new Projectile(this, timeOfCreation, sprite, objects);
+    shootProjectile(timeOfCreation, sprite, objects, pressedKeys) {
+        let projectile = new Projectile(this, timeOfCreation, sprite, objects, pressedKeys);
         projectile.spawn();
     };
 
