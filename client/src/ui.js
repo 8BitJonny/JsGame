@@ -2,11 +2,6 @@ const { isFunction } = require("./utils");
 
 module.exports.UI = class UI {
     constructor() {
-        document.getElementById("loginForm").onsubmit = this._onLogin.bind(this);
-        document.getElementById("playForm").onsubmit = this._onPlay.bind(this);
-        document.getElementById("loginButton").focus();
-
-
         this.cfg = document.getElementById("foreground");   //cfg = canvas foreground
         this.cbg = document.getElementById("background");   //cbg = canvas background
 
@@ -73,9 +68,8 @@ module.exports.UI = class UI {
 
     drawPauseScreen() {
         let loadingHtml = document.getElementById("loadingAssets");
-        let startScreen = document.getElementById("startScreen");
 
-        if (loadingHtml.style.display !== "none" || startScreen.style.display !== "none") {
+        if (loadingHtml.style.display !== "none") {
             return
         }
 
@@ -98,43 +92,5 @@ module.exports.UI = class UI {
 
         clientVersionHtml.innerHTML = clientVersion;
         serverVersionHtml.innerHTML = serverVersion;
-    }
-
-    _onLogin(e) {
-        e.preventDefault();
-        let loginButton = document.getElementById("loginButton");
-        let playDiv = document.getElementById("playForm");
-
-        loginButton.style.display = "none";
-        playDiv.style.display = "inline-block";
-
-        document.getElementById("playerName").focus();
-    }
-
-    _onPlay(e) {
-        e.preventDefault();
-        let startScreen = document.getElementById("startScreen");
-        let playerName = document.getElementById("playerName").value;
-
-        // if name is null or empty
-        if (!playerName||!playerName.trim()) {
-            let errorSpan = document.getElementById("formError");
-            errorSpan.innerHTML = "The name cannot be empty!";
-            errorSpan.className = "error active";
-            return;
-        }
-
-        if (playerName.length > 12) {
-            let errorSpan = document.getElementById("formError");
-            errorSpan.innerHTML = "The given name is too long!";
-            errorSpan.className = "error active";
-            return
-        }
-
-        startScreen.style.display = "none";
-
-        if (isFunction(this.onGameStart)) {
-            this.onGameStart(playerName)
-        }
     }
 };

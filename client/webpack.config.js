@@ -41,7 +41,7 @@ module.exports = {
     plugins: [
         new HtmlWebpackPlugin({
             template: '!!ejs-compiled-loader!templates/views/index.ejs',
-            filename: 'index.test.html'
+            filename: 'index.html'
         }),
         new HtmlWebpackPlugin({
             template: '!!ejs-compiled-loader!templates/views/login.ejs',

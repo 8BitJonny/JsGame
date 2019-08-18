@@ -1,7 +1,9 @@
 <!-- templates/components/startScreen.ejs -->
-<% include ../components/asciLogo.ejs %>
-<form id="playForm">
-    <input id="playerName" class=" f-white b-black" type="text" placeholder="Enter your Online Name"><br>
-    <span id="formError" class="error" aria-live="polite"></span><br><br>
-    <button id="playButton" class="butn f-white b-black" type="submit">Play</button>
-</form>
+<div id="startScreen" class="fullScreen b-black">
+    <% include ../components/asciLogo.ejs %>
+    <form id="playForm" action="/game.html">
+        <input id="playerName" class=" f-white b-black" type="text" placeholder="Enter your Online Name"><br>
+        <span id="formError" class="error" aria-live="polite"></span><br><br>
+        <button id="playButton" class="butn f-white b-black" type="submit">Play</button>
+    </form>
+</div>

@@ -1,40 +1,53 @@
 <!DOCTYPE html>
 <html>
+
     <head>
+        <!-- templates/components/head.ejs -->
         <title>Pago</title>
+        <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
         <style>
             .f-white {
                 color: #ffffff;
             }
+
             .f-black {
-                 color: #000000;
+                color: #000000;
             }
+
             .b-white {
                 background-color: #ffffff;
             }
+
             .b-black {
                 background-color: #000000;
             }
+
             #background {
-                background-color: rgb(46,41,57);
+                background-color: rgb(46, 41, 57);
                 z-index: 0;
             }
+
             #foreground {
                 z-index: 1;
             }
-            #background, #foreground {
+
+            #background,
+            #foreground {
                 position: absolute
             }
+
             #loadingAssets {
                 text-align: center;
                 align-items: center;
                 justify-content: center;
             }
+
             #loadingMessage {
                 font-size: 3em;
                 margin: 0;
                 padding: 0;
             }
+
             #versions {
                 position: absolute;
                 bottom: 10px;
@@ -42,6 +55,7 @@
                 z-index: 10;
                 color: white;
             }
+
             .fullScreen {
                 flex-direction: column;
                 justify-content: center;
@@ -52,14 +66,17 @@
                 display: flex;
                 position: absolute;
             }
+
             .center {
                 text-align: center;
                 align-items: center;
                 justify-content: center;
             }
+
             .menu-btn {
                 width: 160px;
             }
+
             .butn {
                 -webkit-border-radius: 0;
                 -moz-border-radius: 0;
@@ -70,30 +87,35 @@
                 border: solid #ffffff 2px;
                 text-decoration: none;
             }
+
             .butn:hover {
                 background: #ffffff;
                 color: #000000;
                 border: solid #000000 2px;
                 text-decoration: none;
             }
+
             #playForm {
-                display: none;
                 font-size: 1.3em;
             }
+
             #playerName {
                 padding: 5px;
                 font-size: 1em;
             }
+
             /* This is our style for the invalid fields */
-            #playerName:invalid{
+            #playerName:invalid {
                 border-color: #900;
                 background-color: #FDD;
             }
+
             #playerName:focus:invalid {
                 outline: none;
             }
+
             .error {
-                width  : 100%;
+                width: 100%;
                 padding: 0;
 
                 font-size: 80%;
@@ -108,34 +130,24 @@
             .error.active {
                 padding: 0.3em;
             }
+
             form {
                 text-align: center;
             }
+
             body {
                 margin: 0;
             }
+
         </style>
-        <script type="text/javascript" src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
-        <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
     </head>
+
     <body>
-        <div id="versions">
-            <span>Ping: <span id="ping"></span></span><br>
-            <span>Server: <span id="connectionStatus">Offline</span></span><br>
-            <span>Client version: <span id="clientVersion">/</span></span><br>
-            <span>Server version: <span id="serverVersion">/</span></span><br>
-        </div>
-        <div id="pauseScreen" class="fullScreen b-black center" style="opacity: 0.7; display: none">
-            <h1 class="f-white">Pause</h1><br>
-            <button id="resumeGameBtn" class="butn menu-btn f-white b-black" type="submit">Resume</button><br>
-            <button id="settingsBtn" class="butn menu-btn f-white b-black" type="submit">Settings</button><br>
-            <button id="exitGameBtn" class="butn menu-btn f-white b-black" type="submit">Exit</button><br>
-        </div>
-        <div id="loadingAssets" class="fullScreen b-black center">
-            <p id="loadingMessage" class="f-white">Loading ...</p>
-        </div>
+        <!-- templates/components/startScreen.ejs -->
         <div id="startScreen" class="fullScreen b-black">
-            <h2 class="f-white"><pre>
+            <!-- templates/components/asciLogo.ejs -->
+            <h2 class="f-white">
+                <pre>
         ##### ##
      ######  /###
     /#   /  /  ###
@@ -155,22 +167,13 @@
  ###    /                         ####   ###
   #####/                        /######  /#
     ###                        /     ###/
-            </pre></h2>
-            <form id="loginForm">
+</pre>
+            </h2>
+            <form id="loginForm" action="/login.html">
                 <button id="loginButton" class="butn f-white b-black" type="submit">Login</button><br>
             </form>
-            <form id="playForm">
-                <input id="playerName" class=" f-white b-black" type="text" placeholder="Enter your Online Name"><br>
-                <span id="formError" class="error" aria-live="polite"></span><br><br>
-                <button id="playButton" class="butn f-white b-black" type="submit">Play</button>
-            </form>
         </div>
-        <canvas id="background">
-        
-        </canvas>
-        <canvas id="foreground">
-        
-        </canvas>
-        <script src="bundle.js"></script>
+        <script type="text/javascript" src="bundle.js"></script>
     </body>
+
 </html>

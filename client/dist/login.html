@@ -96,7 +96,6 @@
             }
 
             #playForm {
-                display: none;
                 font-size: 1.3em;
             }
 
@@ -145,9 +144,10 @@
 
     <body>
         <!-- templates/components/startScreen.ejs -->
-        <!-- templates/components/asciLogo.ejs -->
-        <h2 class="f-white">
-            <pre>
+        <div id="startScreen" class="fullScreen b-black">
+            <!-- templates/components/asciLogo.ejs -->
+            <h2 class="f-white">
+                <pre>
         ##### ##
      ######  /###
     /#   /  /  ###
@@ -168,14 +168,13 @@
   #####/                        /######  /#
     ###                        /     ###/
 </pre>
-        </h2>
-        <form id="playForm">
-            <input id="playerName" class=" f-white b-black" type="text" placeholder="Enter your Online Name"><br>
-            <span id="formError" class="error" aria-live="polite"></span><br><br>
-            <button id="playButton" class="butn f-white b-black" type="submit">Play</button>
-        </form>
-
-        <script src="bundle.js"></script>
+            </h2>
+            <form id="playForm" action="/game.html">
+                <input id="playerName" class=" f-white b-black" type="text" placeholder="Enter your Online Name"><br>
+                <span id="formError" class="error" aria-live="polite"></span><br><br>
+                <button id="playButton" class="butn f-white b-black" type="submit">Play</button>
+            </form>
+        </div>
         <script type="text/javascript" src="bundle.js"></script>
     </body>
 
