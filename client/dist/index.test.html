@@ -1,127 +1,153 @@
 <!DOCTYPE html>
 <html>
+
     <head>
         <!-- templates/components/head.ejs -->
-<title>Pago</title>
-<link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
-<style>
-    .f-white {
-        color: #ffffff;
-    }
-    .f-black {
-        color: #000000;
-    }
-    .b-white {
-        background-color: #ffffff;
-    }
-    .b-black {
-        background-color: #000000;
-    }
-    #background {
-        background-color: rgb(46,41,57);
-        z-index: 0;
-    }
-    #foreground {
-        z-index: 1;
-    }
-    #background, #foreground {
-        position: absolute
-    }
-    #loadingAssets {
-        text-align: center;
-        align-items: center;
-        justify-content: center;
-    }
-    #loadingMessage {
-        font-size: 3em;
-        margin: 0;
-        padding: 0;
-    }
-    #versions {
-        position: absolute;
-        bottom: 10px;
-        left: 10px;
-        z-index: 10;
-        color: white;
-    }
-    .fullScreen {
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        width: 100%;
-        height: 100%;
-        z-index: 10;
-        display: flex;
-        position: absolute;
-    }
-    .center {
-        text-align: center;
-        align-items: center;
-        justify-content: center;
-    }
-    .menu-btn {
-        width: 160px;
-    }
-    .butn {
-        -webkit-border-radius: 0;
-        -moz-border-radius: 0;
-        border-radius: 0px;
-        font-family: Georgia;
-        font-size: 20px;
-        padding: 10px 20px 10px 20px;
-        border: solid #ffffff 2px;
-        text-decoration: none;
-    }
-    .butn:hover {
-        background: #ffffff;
-        color: #000000;
-        border: solid #000000 2px;
-        text-decoration: none;
-    }
-    #playForm {
-        display: none;
-        font-size: 1.3em;
-    }
-    #playerName {
-        padding: 5px;
-        font-size: 1em;
-    }
-    /* This is our style for the invalid fields */
-    #playerName:invalid{
-        border-color: #900;
-        background-color: #FDD;
-    }
-    #playerName:focus:invalid {
-        outline: none;
-    }
-    .error {
-        width  : 100%;
-        padding: 0;
+        <title>Pago</title>
+        <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
+        <style>
+            .f-white {
+                color: #ffffff;
+            }
 
-        font-size: 80%;
-        color: white;
-        background-color: #900;
-        border-radius: 0 0 5px 5px;
+            .f-black {
+                color: #000000;
+            }
 
-        -moz-box-sizing: border-box;
-        box-sizing: border-box;
-    }
+            .b-white {
+                background-color: #ffffff;
+            }
 
-    .error.active {
-        padding: 0.3em;
-    }
-    form {
-        text-align: center;
-    }
-    body {
-        margin: 0;
-    }
-</style>
+            .b-black {
+                background-color: #000000;
+            }
+
+            #background {
+                background-color: rgb(46, 41, 57);
+                z-index: 0;
+            }
+
+            #foreground {
+                z-index: 1;
+            }
+
+            #background,
+            #foreground {
+                position: absolute
+            }
+
+            #loadingAssets {
+                text-align: center;
+                align-items: center;
+                justify-content: center;
+            }
+
+            #loadingMessage {
+                font-size: 3em;
+                margin: 0;
+                padding: 0;
+            }
+
+            #versions {
+                position: absolute;
+                bottom: 10px;
+                left: 10px;
+                z-index: 10;
+                color: white;
+            }
+
+            .fullScreen {
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                width: 100%;
+                height: 100%;
+                z-index: 10;
+                display: flex;
+                position: absolute;
+            }
+
+            .center {
+                text-align: center;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .menu-btn {
+                width: 160px;
+            }
+
+            .butn {
+                -webkit-border-radius: 0;
+                -moz-border-radius: 0;
+                border-radius: 0px;
+                font-family: Georgia;
+                font-size: 20px;
+                padding: 10px 20px 10px 20px;
+                border: solid #ffffff 2px;
+                text-decoration: none;
+            }
+
+            .butn:hover {
+                background: #ffffff;
+                color: #000000;
+                border: solid #000000 2px;
+                text-decoration: none;
+            }
+
+            #playForm {
+                display: none;
+                font-size: 1.3em;
+            }
+
+            #playerName {
+                padding: 5px;
+                font-size: 1em;
+            }
+
+            /* This is our style for the invalid fields */
+            #playerName:invalid {
+                border-color: #900;
+                background-color: #FDD;
+            }
+
+            #playerName:focus:invalid {
+                outline: none;
+            }
+
+            .error {
+                width: 100%;
+                padding: 0;
+
+                font-size: 80%;
+                color: white;
+                background-color: #900;
+                border-radius: 0 0 5px 5px;
+
+                -moz-box-sizing: border-box;
+                box-sizing: border-box;
+            }
+
+            .error.active {
+                padding: 0.3em;
+            }
+
+            form {
+                text-align: center;
+            }
+
+            body {
+                margin: 0;
+            }
+
+        </style>
     </head>
+
     <body>
         <!-- templates/components/startScreen.ejs -->
-<!-- templates/components/asciLogo.ejs -->
-<h2 class="f-white"><pre>
+        <!-- templates/components/asciLogo.ejs -->
+        <h2 class="f-white">
+            <pre>
         ##### ##
      ######  /###
     /#   /  /  ###
@@ -141,12 +167,15 @@
  ###    /                         ####   ###
   #####/                        /######  /#
     ###                        /     ###/
-</pre></h2>
-<form id="loginForm">
-    <button id="loginButton" class="butn f-white b-black" type="submit">Login</button><br>
-</form>
+</pre>
+        </h2>
+        <form id="loginForm">
+            <button id="loginButton" class="butn f-white b-black" type="submit">Login</button><br>
+        </form>
 
 
         <script src="bundle.js"></script>
-    <script type="text/javascript" src="bundle.js"></script></body>
+        <script type="text/javascript" src="bundle.js"></script>
+    </body>
+
 </html>
