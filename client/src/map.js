@@ -68,7 +68,7 @@ module.exports.Map = class Map {
                     break;
                 case "objectgroup":
                     layer.objects.forEach(object => {
-                        let newCollider = new GameObject(null, object.x * this.SCALE, object.y * this.SCALE);
+                        let newCollider = new GameObject(null, null, object.x * this.SCALE, object.y * this.SCALE);
                         newCollider.hitBox = {
                             width: object.width * this.SCALE, 
                             height: object.height * this.SCALE  

@@ -18,15 +18,15 @@ module.exports.Server = class {
     }
 
     //Connects a Player to a Lobby or disconnects a Player from a Lobby or does both
-    switchPlayersLobby(player, fromLobbyID, toLobbyID) {
+    switchPlayersLobby(player, fromLobbyID, toLobbyID, playername) {
         if (fromLobbyID) {
-            this.lobbies[fromLobbyID].removePlayer(player.userid);
+            this.lobbies[fromLobbyID].removePlayer(player.userid, playername);
             player.lobby = null;
             player.leave(fromLobbyID);                              //Disconnect him to the socket room
         }
 
         if (toLobbyID) {
-            this.lobbies[toLobbyID].addPlayer(player.userid);
+            this.lobbies[toLobbyID].addPlayer(player.userid, playername);
             player.join(toLobbyID);                                 //Connect him to the socket room
             player.lobby = toLobbyID;
         }

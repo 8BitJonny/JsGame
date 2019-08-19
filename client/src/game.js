@@ -76,7 +76,7 @@ module.exports.Game = class Game {
 
     // main game loop with update and draw method call
     gameLoop(time) {
-        let timeSinceLastFrame = (time - this.lastFrameTime)/16;     //how much time has passed since last drawn frame relative to our standard interval of 16 ms
+        let timeSinceLastFrame = (time - this.lastFrameTime)/1000;     //how much time has passed since last drawn frame relative to our standard interval of 16 ms
         this.lastFrameTime = time;
 
         this.ctxForeground.clearRect(0,0,this.ui.cfg.width, this.ui.cfg.height);
@@ -105,7 +105,7 @@ module.exports.Game = class Game {
     // initialize Gameobject like map, the character, inputhandler, ...
     initializeGameObjects(playerName) {
         this.map = new Map(this.assetLoader.mapLayouts["mainLobby"], this.assetLoader.sprites["mainLobby"], 240, 24, 10);
-        this.character = new Player(this.assetLoader.sprites["player2"], 100, 100, playerName);
+        this.character = new Player(this.assetLoader.sprites["player2"], 100, 100, playerName, this.assetLoader.sprites["ball"]);
 
         window.addEventListener("resize", () => {
             this.ctxForeground.imageSmoothingEnabled = false;
@@ -169,7 +169,7 @@ module.exports.Game = class Game {
                 this.objects.splice(i,1);
             }
             
-            object.update();
+            object.update(timePassed);
         }
 
         // Process the received server updates and
@@ -185,6 +185,6 @@ module.exports.Game = class Game {
 
     // connect to the server
     connectToServer() {
-        this.networking = new Networking('https://play-pago.com', this);
+        this.networking = new Networking('http://localhost:4004', this);
     };
 };

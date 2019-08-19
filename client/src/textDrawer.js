@@ -2,7 +2,7 @@ const { GameObject } = require("./gameObject");
 
 module.exports.TextDrawer = class TextDrawer extends GameObject {
     constructor(text, x, y) {
-        super(null, x, y);
+        super(null, null, x, y);
         this.text = text
     };
 

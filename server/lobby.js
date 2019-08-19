@@ -20,9 +20,9 @@ module.exports.Lobby = class Lobby {
     }
 
     // Connects Player to Lobby
-    addPlayer(playerID) {
+    addPlayer(playerID, playername) {
         console.log("[LBY] Connects: " + playerID.slice(0,5) + " to Lobby: ", this.id);
-        let newPlayer = new Player(null, 100, 100); //Todo Later on spawn him on map defined spawn point
+        let newPlayer = new Player(null, 100, 100, playername, null); //Todo Later on spawn him on map defined spawn point
         newPlayer.collisionDetection = this.gameEngine.collisionDetection;
         newPlayer.hitBox = {                        //Todo That is really bad written
             width: 30.2,

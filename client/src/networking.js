@@ -1,4 +1,6 @@
 const { Player } = require("./player");
+const { Projectile } = require("./projectile");
+const { SpriteInterpreter } = require("./spriteInterpreter");
 const { Vector } = require("./vector");
 const { fix, v_lerp } = require("./utils");
 
@@ -49,7 +51,7 @@ module.exports.Networking = class Networking {
     // Sends the received input from the player and the StateIndex to the server e.g. which keys he pressed to move or to do an action
     sendInput(inputState) {
         this.lastSendSID = inputState.stateIndex;
-        this.socket.emit("i", { k: inputState.keysDown, si: inputState.stateIndex, t: inputState.time});
+        this.socket.emit("i", { k: inputState.keysDown, si: inputState.stateIndex, td: inputState.timeDelta, t: inputState.time});
     }
 
     // Corrects the previous made Client Side prediction with the newest received
@@ -149,12 +151,11 @@ module.exports.Networking = class Networking {
             }
 
             if (this.socket.userid === playerId) {
-                // we don't want to interpolate ourselve
+                // we don't want to interpolate ourselves
                 continue
             }
 
             const targetPlayerState = target.p[playerId];
-
 
             if (this.game.onlinePlayer.hasOwnProperty(playerId)) {
                 // The player object already exists and we just need to update him
@@ -177,6 +178,43 @@ module.exports.Networking = class Networking {
 
                 // this.game.onlinePlayer[playerId] = new Player(this.game.assetLoader.sprites["player1"], targetPlayerState.p.x, targetPlayerState.p.y)
             }
+        }
+
+        // iterate over every object send from the server
+        for (let index in target.o) {
+            console.log("1");
+            const targetObjectState = target.o[index];
+
+            let localObject = this.game.objects.filter(object => object.id === targetObjectState.id)[0];
+            if (localObject !== undefined) {
+                console.log("2");
+                // The online object already exists in our game and we just need to update it
+                let baseObjectState = previous.o.filter(object => object.id === targetObjectState.id)[0];
+                if (baseObjectState === undefined) {
+                    // We don't have any previous data points for this object
+                    continue
+                }
+                console.log("3");
+                // calculate the position based on the previous calculated percentage
+                localObject.position = v_lerp(baseObjectState.p, targetObjectState.p, relativeDistance);
+            } else {
+                // The online object is new and we don't have it locally
+                // Therefore create a new entry for it in the array
+                console.log("4");
+                switch(targetObjectState.t) {
+                    case "projectile":
+                        const sprite = this.game.assetLoader.sprites["ball"];
+                        const projectile = new Projectile(targetObjectState.p, new Vector(0,0), targetObjectState.to, sprite, null);
+                        projectile.id = targetObjectState.id;
+                        this.game.objects.push(projectile);
+
+                        console.log("5: ", this.game.objects[this.game.objects.length - 1].id, ": :", targetObjectState.id);
+                        break;
+                    default:
+                        break;
+                }
+            }
+
         }
     }
 
@@ -232,6 +270,8 @@ module.exports.Networking = class Networking {
             const amountToClear = this.serverUpdates.length - ( 60*this.BUFFERSIZE );
             this.serverUpdates.splice(0,amountToClear);
         }
+
+        this.game.objects = this.game.objects.filter(object => object.id !== "none");
 
         // Apply the server state for each player
         for (let playerId in payload.p) {

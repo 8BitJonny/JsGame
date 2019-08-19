@@ -6,15 +6,15 @@ const { CollisionDetection } = require("./collisionDetection");
 const { Projectile } = require("./projectile.js");
 
 module.exports.Player = class Player extends GameObject {
-    constructor(imgSprite,x,y,playerName){
+    constructor(imgSprite,x,y,playerName,projectileSprite){
         let PADDINGX = 42;
         let PADDINGY = 10;
         let SCALE = 1;
         let spriteInterpreter = imgSprite != null ? new SpriteInterpreter(imgSprite, SCALE, 0, 0, 4, 4, PADDINGX, PADDINGY) : null;
 
-        super(spriteInterpreter, x, y);
+        super(null, spriteInterpreter, x, y, "player");
         this.SCALE = SCALE;
-        this.MAXSPEED = 2;
+        this.MAXSPEED = 140;
 
         this.playerName = playerName;
         if (spriteInterpreter != null) {
@@ -29,11 +29,15 @@ module.exports.Player = class Player extends GameObject {
             imgSprite != null ? new SpriteInterpreter(imgSprite, this.SCALE,  1, 2, 4, 4, PADDINGX, PADDINGY, 10) : null,
             imgSprite != null ? new SpriteInterpreter(imgSprite, this.SCALE, 13, 2, 4, 4, PADDINGX, PADDINGY, 10) : null
         ];
+        this.projectileSprite = projectileSprite;
 
         this.collisionDetection = null;
 
         this.lastInputID = -1;
         this.inputHistory = [];
+
+        this.PROJECTILE_CD = 0.2;
+        this.lastProjectile = 0;
     };
 
     update() {
@@ -42,34 +46,33 @@ module.exports.Player = class Player extends GameObject {
             let oldPosition = this.position.copy();
 
             //check if the hitbox of the next frame collides with something when only the xVelocity is added to the hitbox
-            this.position.x += this.velocity.x;
+            this.position.x += this.timeBasedVelocity.x;
             let isCollidingX = this.collisionDetection.isColliding(this.position, this.hitBox);
 
             if (isCollidingX) {
                 // if it collides reset this the xVelocity
-                this.velocity.x = 0;
+                this.timeBasedVelocity.x = 0;
             }
 
             //reset the hitbox to now check the yAxis
             this.position = oldPosition.copy();
 
             //check if the hitbox of the next frame collides with something when only the yVelocity is added to the hitbox
-            this.position.y += this.velocity.y;
+            this.position.y += this.timeBasedVelocity.y;
             let isCollidingY = this.collisionDetection.isColliding(this.position, this.hitBox);
 
             if (isCollidingY) {
                 // if it collides reset this the yVelocity
-                this.velocity.y = 0;
+                this.timeBasedVelocity.y = 0;
             }
 
             //reset the hitbox and the position because through object reference the position variable changed too
             this.position = oldPosition.copy();
         }
-
         super.update();
     };
 
-    updateVelocity() {
+    handleInput(gameObjectList) {
         if (!this.inputHistory.length) {
             // No Inputs to process
             this.velocity = new Vector(0, 0);
@@ -85,24 +88,53 @@ module.exports.Player = class Player extends GameObject {
                 continue
             }
 
-
             const input = this.inputHistory[inputIndex];
             for (let keyIndex = 0; keyIndex < input.keysDown.length; keyIndex++) {
 
                 let key = input.keysDown[keyIndex];
-                if (key === "KeyW" || key === "ArrowUp") {
-                    newVelocity.y -= this.MAXSPEED * input.time;
-                } else if (key === "KeyS" || key === "ArrowDown") {
-                    newVelocity.y += this.MAXSPEED * input.time;
-                } else if (key === "KeyA" || key === "ArrowLeft") {
-                    newVelocity.x -= this.MAXSPEED * input.time;
-                } else if (key === "KeyD" || key === "ArrowRight") {
-                    newVelocity.x += this.MAXSPEED * input.time;
+                switch(key) {
+                    case "KeyW":
+                    case "ArrowUp":
+                        // Move Up
+                        newVelocity.y -= this.MAXSPEED * input.timeDelta;
+                        break;
+                    case "KeyS":
+                    case "ArrowDown":
+                        // Move Down
+                        newVelocity.y += this.MAXSPEED * input.timeDelta;
+                        break;
+                    case "KeyA":
+                    case "ArrowLeft":
+                        // Move Left
+                        newVelocity.x -= this.MAXSPEED * input.timeDelta;
+                        break;
+                    case "KeyD":
+                    case "ArrowRight":
+                        // Move Right
+                        newVelocity.x += this.MAXSPEED * input.timeDelta;
+                        break;
+                    case "Space":
+                        // Shoot Projectile
+                        if (input.time > this.lastProjectile + this.PROJECTILE_CD) {
+                            this.lastProjectile = input.time;
+                            this.shootProjectile(input.time, this.projectileSprite, gameObjectList);
+                        }
+
+                        break;
+                    default:
+                        // code block
                 }
             }
         }
         this.lastInputID = this.inputHistory[this.inputHistory.length - 1].stateIndex;
 
+        this.updateFacingDirection(newVelocity,oldFacingDirection);
+
+        this.velocity = newVelocity;
+        this.timeBasedVelocity = this.velocity.copy();
+    }
+
+    updateFacingDirection(newVelocity, oldFacingDirection) {
         // Figure out the facing Direction
         if (newVelocity.x === 0 && newVelocity.y === 0) {
             this.facingDirection = 0;
@@ -129,12 +161,10 @@ module.exports.Player = class Player extends GameObject {
         if (oldFacingDirection !== this.facingDirection) {
             this.spriteInterpreter = this.spriteInterpreterList[this.facingDirection]
         }
-
-        this.velocity = newVelocity;
-    };
+    }
 
     shootProjectile(timeOfCreation, sprite, objects) {
-        let projectile = new Projectile(this, timeOfCreation, sprite, objects);
+        let projectile = new Projectile(this.position.add(new Vector(20,10)), this.velocity, timeOfCreation, sprite, objects);
         projectile.spawn();
     };
 
