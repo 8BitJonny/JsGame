@@ -3,14 +3,18 @@ const { Game } = require("./game");
 switch(window.location.pathname) {
     case "/":
         document.getElementById("loginButton").focus();
-        document.getElementById("loginForm").onsubmit = () => {
+        document.getElementById("loginForm").onsubmit = (e) => {
+            e.preventDefault();
             setInHouseRoutingToken();
+            window.location.pathname = "/login.html";
         };
         break;
     case "/login":
+    case "/login.html":
         validateInHouseRoutingToken();
         document.getElementById("playerName").focus();
         document.getElementById("playForm").onsubmit = (e) => {
+            e.preventDefault();
             setInHouseRoutingToken();
 
             let startScreen = document.getElementById("startScreen");
@@ -36,10 +40,12 @@ switch(window.location.pathname) {
             startScreen.style.display = "none";
 
             setLocalStorage("playername", playerName);
+            window.location.pathname = "/game.html";
         };
         // code block
         break;
     case "/game":
+    case "/game.html":
         validateInHouseRoutingToken();
         const playername = readLocalStorage("playername");
 
