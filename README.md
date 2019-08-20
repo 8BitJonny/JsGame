@@ -14,6 +14,9 @@
   <a href="https://github.com/8BitJonny/JsGame/blob/master/LICENSE.md" alt="License">
         <img src="https://img.shields.io/github/license/8BitJonny/JsGame.svg" /></a>
 </p>
+<p align="center">
+      <img src="giphy.gif" />
+</p>
 
 # Pago
 A fun little web based game written in plain Javascript.
