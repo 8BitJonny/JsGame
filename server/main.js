@@ -32,15 +32,15 @@ io.sockets.on('connection',
             client.userid = UUID();
             console.log("[CON] We got a new client: ", client.userid.slice(0,5));
 
-            server.switchPlayersLobby(client, null, firstLobby);
+            server.switchPlayersLobby(client, null, firstLobby, payload.pn);
 
             let player = server.lobbies[firstLobby].players[client.userid];
-            player.playerName = payload.pn;
 
             let playerNetworkData = player.returnNetworkData();
             playerNetworkData.pn = payload.pn;
             playerNetworkData.id = client.userid;
 
+            // send networkData from all online players on initial connect
             let onlinePlayer = {};
             for (let playerId in server.lobbies[firstLobby].players) {
                 if (server.lobbies[firstLobby].players.hasOwnProperty(playerId)) {

@@ -1,10 +1,16 @@
+const { makeId } = require("./utils");
 const { Vector } = require("./vector");
 
 module.exports.GameObject = class GameObject {
-    constructor(spriteInterpreter, x, y) {                      
+    constructor(id, spriteInterpreter, x, y, type, owner) {
+        this.type = type;
+        this.id = id != null ? id : makeId(5);
+        this.owner = owner; // the player who create this object
+
         this.spriteInterpreter = spriteInterpreter;
         this.position = new Vector(x,y);
         this.velocity = new Vector(0,0);
+        this.timeBasedVelocity = new Vector(0,0); // this veloctiy is based on how much time passed
         this.toBeDeleted = false;
 
         let shapeWidth = this.spriteInterpreter != null ? this.spriteInterpreter.shapeWidth : 0;
@@ -36,8 +42,12 @@ module.exports.GameObject = class GameObject {
     
     update() {
         // the velocity represent the speed in pixels per second.
-        this.position = this.position.add(this.velocity);
+        this.position = this.position.add(this.timeBasedVelocity);
     };
+
+    calculateTimeBasedVelocity(timePassed) {
+        this.timeBasedVelocity = this.velocity.mul_scalar(timePassed)
+    }
     
     drawDebug(ctx) {
         ctx.strokeStyle = "red";
@@ -47,6 +57,19 @@ module.exports.GameObject = class GameObject {
     addChildren(obj) {
         if (obj instanceof GameObject) {
             this.children.push(obj);
+        }
+    }
+
+    // This function returns a small an compact object describing the player state
+    // It is only used by the server, NOT by the client.
+    returnNetworkData() {
+        return {
+            id: this.id,
+            t: this.type,
+            p: {                        // Send the position
+                x: this.position.x,
+                y: this.position.y
+            }
         }
     }
 };

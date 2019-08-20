@@ -1,3 +1,4 @@
+const { Projectile } = require("../client/src/projectile");
 const { CollisionDetection } = require("../client/src/collisionDetection");
 const { fix } = require("../client/src/utils");
 
@@ -6,29 +7,22 @@ const vendors = [ 'ms', 'moz', 'webkit', 'o' ];
 let lastTime = 0;
 global.window = global.document = global;
 
-for ( let x = 0; x < vendors.length && !window.requestAnimationFrame; ++ x ) {
-    window.requestAnimationFrame = window[ vendors[ x ] + 'RequestAnimationFrame' ];
-    window.cancelAnimationFrame = window[ vendors[ x ] + 'CancelAnimationFrame' ] || window[ vendors[ x ] + 'CancelRequestAnimationFrame' ];
-}
+window.requestAnimationFrame = function ( callback ) {
+    var currTime = Date.now(), timeToCall = Math.max( 0, frameTime - ( currTime - lastTime ) );
+    let timeDiff = (currTime + timeToCall - lastTime) / 1000;
+    var id = window.setTimeout( function() { callback( timeDiff ); }, timeToCall );
+    lastTime = currTime + timeToCall;
+    return id;
+};
 
-if ( !window.requestAnimationFrame ) {
-    window.requestAnimationFrame = function ( callback ) {
-        var currTime = Date.now(), timeToCall = Math.max( 0, frameTime - ( currTime - lastTime ) );
-        var id = window.setTimeout( function() { callback( currTime + timeToCall ); }, timeToCall );
-        lastTime = currTime + timeToCall;
-        return id;
-    };
-}
-
-if ( !window.cancelAnimationFrame ) {
-    window.cancelAnimationFrame = function ( id ) { clearTimeout( id ); };
-}
+window.cancelAnimationFrame = function ( id ) { clearTimeout( id ); };
 
 module.exports.GameEngine = class {
     constructor(lobby) {
         this.lobby = lobby;
         this.lastState = {};
         this.collisionDetection = new CollisionDetection(this.lobby.map.colliders);
+        this.gameObjects = [];
 
         // some variables for time management
         this._deltaTime = 16;
@@ -43,27 +37,40 @@ module.exports.GameEngine = class {
         player.inputHistory.push({
             stateIndex: payload.si,
             keysDown: payload.k,
+            timeDelta: payload.td,
             time: payload.t
         });
     }
 
     // update all players and send every connected client a new server state back
-    update() {
-        let timeSinceLastFrame = this._deltaTime / 7;     //how much time has passed since last drawn frame relative to our standard interval of 16 ms
-
+    update(timeSinceLastFrame) {
         // Update Position based on current set velocity.
         for (let playerID in this.lobby.players) {
             if (this.lobby.players.hasOwnProperty(playerID)) {
                 let player = this.lobby.players[playerID];
-                player.updateVelocity();
-                player.update(timeSinceLastFrame);          // this player.update method also checks collision
+                player.handleInput(this.gameObjects);
+                player.update();          // this player.update method also checks collision
                 player.inputHistory = [];
             }
+        }
+
+        for (let i = 0; i < this.gameObjects.length; i++) {
+            let object = this.gameObjects[i];
+
+            if (object instanceof Projectile) {
+                object.checkforDeletion(this.local_time);
+            }
+            if (this.gameObjects[i].toBeDeleted === true){
+                this.gameObjects.splice(i,1);
+            }
+
+            object.update(timeSinceLastFrame);
         }
 
         // build new serverState
         this.lastState = {
             p: this.returnNetworkDataForAllPlayers(),
+            o: this.returnNetworkDataForAllObjects(),
             t: fix(this.local_time)
         };
         this.lobby.broadcast("serverstate", this.lastState);
@@ -77,6 +84,16 @@ module.exports.GameEngine = class {
             if (this.lobby.players.hasOwnProperty(playerID)) {
                 networkData[playerID] = this.lobby.players[playerID].returnNetworkData()
             }
+        }
+        return networkData;
+    }
+
+    // reduce object data to the minimum that is needed to be send over the network
+    returnNetworkDataForAllObjects() {
+        let networkData = [];
+        for (let index in this.gameObjects) {
+            const object = this.gameObjects[index];
+            networkData.push(object.returnNetworkData())
         }
         return networkData;
     }

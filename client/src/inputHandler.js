@@ -2,12 +2,13 @@ module.exports.InputHandler = class InputHandler{
     constructor(player, game){
         this.player = player;
         this.game = game;
-        this.PROJECTILE_CD = 0.2
+        this.PROJECTILE_CD = 0.2;
         this.lastProjectile = 0;
 
         this.inputState = {
             stateIndex: 0,
             keysDown: [],
+            timeDelta: null,
             time: null
         };
         this.inputHistory = [];
@@ -67,22 +68,20 @@ module.exports.InputHandler = class InputHandler{
         this.inputState.stateIndex ++;
         // Later on we can filter out keys that aren't relevant for the server like pause button pressed
 
-        if (this.inputState.keysDown.includes("Space") && this.game.networking.clientTime > this.lastProjectile + this.PROJECTILE_CD){
-            this.lastProjectile = this.game.networking.clientTime;
-            this.player.shootProjectile(this.game.networking.clientTime, this.game.assetLoader.sprites["ball"],this.game.objects);
-        }
         this.inputHistory.push({
             stateIndex: this.inputState.stateIndex,
             keysDown: this.inputState.keysDown.slice(),
-            time: timePassed
+            timeDelta: timePassed,
+            time: this.game.networking.clientTime
         });
         this.player.inputHistory.push({
             stateIndex: this.inputState.stateIndex,
             keysDown: this.inputState.keysDown.slice(),
-            time: timePassed
+            timeDelta: timePassed,
+            time: this.game.networking.clientTime
         });
 
-        this.player.updateVelocity();
+        this.player.handleInput(this.game.objects);
     };
 
     prepareAndReturnInputStateForServer() {
