@@ -152,6 +152,29 @@ module.exports.Networking = class Networking {
 
             if (this.socket.userid === playerId) {
                 // we don't want to interpolate ourselves
+
+                // be want to ...
+
+                // ... Delete old Projectile Objects
+                let serverPlayer = target.p[playerId];
+                let indexOfApprovedState = this.game.inputHandler.inputHistory.map( inputItem => inputItem.stateIndex ).indexOf(serverPlayer.si);
+                if (indexOfApprovedState !== -1 || serverPlayer.si > this.game.inputHandler.inputHistory[0].stateIndex) {
+                    let clientTimeOfApprovedStateTime = this.game.inputHandler.inputHistory[indexOfApprovedState].time;
+
+
+                    this.game.objects = this.game.objects.filter(object => {
+                        if (object instanceof Projectile) {
+                            // If it is an Projectile delete it if it's timeOfCreation is before the Time the Server approved
+                            // Because if the ApprovedServerTime is bigger, we now got the real projectile from the server and delete our temporary one without id
+                            return object.timeOfCreation > clientTimeOfApprovedStateTime || object.id !== "none"
+                        } else {
+                            // For all object types leave them in the list
+                            return true
+                        }
+                    });
+                }
+
+
                 continue
             }
 
@@ -182,33 +205,30 @@ module.exports.Networking = class Networking {
 
         // iterate over every object send from the server
         for (let index in target.o) {
-            console.log("1");
             const targetObjectState = target.o[index];
 
             let localObject = this.game.objects.filter(object => object.id === targetObjectState.id)[0];
-            if (localObject !== undefined) {
-                console.log("2");
+            if (targetObjectState.pid === this.socket.userid) {
+                // This is an object which we created in the first place and already have
+                // We skip it
+            } else if (localObject !== undefined) {
                 // The online object already exists in our game and we just need to update it
                 let baseObjectState = previous.o.filter(object => object.id === targetObjectState.id)[0];
                 if (baseObjectState === undefined) {
                     // We don't have any previous data points for this object
                     continue
                 }
-                console.log("3");
                 // calculate the position based on the previous calculated percentage
                 localObject.position = v_lerp(baseObjectState.p, targetObjectState.p, relativeDistance);
             } else {
                 // The online object is new and we don't have it locally
                 // Therefore create a new entry for it in the array
-                console.log("4");
                 switch(targetObjectState.t) {
                     case "projectile":
                         const sprite = this.game.assetLoader.sprites["ball"];
                         const projectile = new Projectile(targetObjectState.p, new Vector(0,0), targetObjectState.to, sprite, null);
                         projectile.id = targetObjectState.id;
                         this.game.objects.push(projectile);
-
-                        console.log("5: ", this.game.objects[this.game.objects.length - 1].id, ": :", targetObjectState.id);
                         break;
                     default:
                         break;
@@ -228,6 +248,7 @@ module.exports.Networking = class Networking {
 
     onServerConnect(payload) {
         this.socket.userid = payload.id;
+        this.game.character.id = payload.id;
         this.game.ui.displayVersions(this.game.config.clientVersion, payload.v);
         this.networkStatus.innerHTML = "Connected";
         this.networkStatus.innerHTML = payload.l;
@@ -271,7 +292,6 @@ module.exports.Networking = class Networking {
             this.serverUpdates.splice(0,amountToClear);
         }
 
-        this.game.objects = this.game.objects.filter(object => object.id !== "none");
 
         // Apply the server state for each player
         for (let playerId in payload.p) {

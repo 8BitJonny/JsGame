@@ -2,9 +2,10 @@ const { makeId } = require("./utils");
 const { Vector } = require("./vector");
 
 module.exports.GameObject = class GameObject {
-    constructor(id, spriteInterpreter, x, y, type) {
+    constructor(id, spriteInterpreter, x, y, type, owner) {
         this.type = type;
         this.id = id != null ? id : makeId(5);
+        this.owner = owner; // the player who create this object
 
         this.spriteInterpreter = spriteInterpreter;
         this.position = new Vector(x,y);

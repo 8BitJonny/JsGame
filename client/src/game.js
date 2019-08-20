@@ -158,7 +158,7 @@ module.exports.Game = class Game {
         this.inputHandler.handleInput(timePassed);                                                      
         let inputStateForServer = this.inputHandler.prepareAndReturnInputStateForServer();              
         this.networking.sendInput(inputStateForServer);
-        
+
         for (let i = 0; i < this.objects.length; i++) {
             let object = this.objects[i];
             

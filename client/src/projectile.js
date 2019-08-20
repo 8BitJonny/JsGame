@@ -2,13 +2,13 @@ const { GameObject } = require("./gameObject.js");
 const { SpriteInterpreter } = require("./spriteInterpreter.js");
 
 module.exports.Projectile = class Projectile extends GameObject{
-    constructor(position, baseVelocity, timeOfCreation, sprite, objects ) {
+    constructor(position, baseVelocity, timeOfCreation, sprite, objects, owner) {
         let projectileStartX = position.x;
         let projectileStartY = position.y;
 
         let spriteInterpreter = sprite != null ? new SpriteInterpreter(sprite, 1, 0, 7, 4, 2, 0, 0, 10) : null;
         let id = sprite != null ? "none" : null;
-        super(id, spriteInterpreter, projectileStartX, projectileStartY, "projectile");
+        super(id, spriteInterpreter, projectileStartX, projectileStartY, "projectile", owner);
         this.PROJECTILESPEED = 420;
         this.LIFESPAN = 0.7;
         this.objects = objects;
@@ -51,6 +51,7 @@ module.exports.Projectile = class Projectile extends GameObject{
     returnNetworkData() {
         return {
             id: this.id,
+            pid: this.owner,
             t: this.type,
             to: this.timeOfCreation,
             p: {                        // Send the position

@@ -12,10 +12,11 @@ module.exports.Player = class Player extends GameObject {
         let SCALE = 1;
         let spriteInterpreter = imgSprite != null ? new SpriteInterpreter(imgSprite, SCALE, 0, 0, 4, 4, PADDINGX, PADDINGY) : null;
 
-        super(null, spriteInterpreter, x, y, "player");
+        super(null, spriteInterpreter, x, y, "player", null);
         this.SCALE = SCALE;
         this.MAXSPEED = 140;
 
+        this.id = null;
         this.playerName = playerName;
         if (spriteInterpreter != null) {
             this.addChildren(new TextDrawer(playerName, this.spriteInterpreter.shapeWidth/2, 0));
@@ -164,7 +165,7 @@ module.exports.Player = class Player extends GameObject {
     }
 
     shootProjectile(timeOfCreation, sprite, objects) {
-        let projectile = new Projectile(this.position.add(new Vector(20,10)), this.velocity, timeOfCreation, sprite, objects);
+        let projectile = new Projectile(this.position.add(new Vector(20,10)), this.velocity, timeOfCreation, sprite, objects, this.id);
         projectile.spawn();
     };
 
