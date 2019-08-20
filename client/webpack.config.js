@@ -1,4 +1,6 @@
 const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const HtmlBeautifyPlugin = require('html-beautify-webpack-plugin');
 
 module.exports = {
     mode: 'development',
@@ -35,5 +37,20 @@ module.exports = {
                 ]
             }
         ]
-    }
+    },
+    plugins: [
+        new HtmlWebpackPlugin({
+            template: '!!ejs-compiled-loader!templates/views/index.ejs',
+            filename: 'index.html'
+        }),
+        new HtmlWebpackPlugin({
+            template: '!!ejs-compiled-loader!templates/views/login.ejs',
+            filename: 'login.html'
+        }),
+        new HtmlWebpackPlugin({
+            template: '!!ejs-compiled-loader!templates/views/game.ejs',
+            filename: 'game.html'
+        }),
+        new HtmlBeautifyPlugin()
+    ]
 };
