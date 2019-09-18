@@ -58,7 +58,7 @@ module.exports.GameEngine = class {
             let object = this.gameObjects[i];
 
             if (object instanceof Projectile) {
-                object.checkforDeletion(this.local_time);
+                object.checkForDeletion(this.local_time);
             }
             if (this.gameObjects[i].toBeDeleted === true){
                 this.gameObjects.splice(i,1);

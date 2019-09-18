@@ -1,5 +1,22 @@
-module.exports.InputHandler = class InputHandler{
-    constructor(player, game){
+import Player from "./player";
+import Game from "./game";
+
+export interface InputState {
+    stateIndex: number;
+    keysDown: string[];
+    timeDelta: number;
+    time: number;
+}
+
+export default class InputHandler{
+    player: Player;
+    game: Game;
+    PROJECTILE_CD: number;
+    lastProjectile: number;
+    inputState: InputState;
+    inputHistory: InputState[];
+
+    constructor(player: Player, game: Game){
         this.player = player;
         this.game = game;
         this.PROJECTILE_CD = 0.2;
@@ -64,7 +81,7 @@ module.exports.InputHandler = class InputHandler{
         });
     };
 
-    handleInput(timePassed) {
+    handleInput(timePassed: number) {
         this.inputState.stateIndex ++;
         // Later on we can filter out keys that aren't relevant for the server like pause button pressed
 

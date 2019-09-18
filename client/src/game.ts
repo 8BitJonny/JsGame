@@ -1,22 +1,36 @@
-const { UI } = require("./ui");
-const { Map } = require("./map");
-const { Player } = require("./player");
-const { Networking } = require("./networking");
-const { AssetLoader } = require("./assetLoader");
-const { InputHandler } = require("./inputHandler");
-const { CollisionDetection } = require("./collisionDetection");
-const { Camera } = require("./camera");
-const { GameObject } = require("./gameObject.js");
-const { SpriteInterpreter } = require("./spriteInterpreter.js");
-const { Projectile } = require("./projectile.js");
-
 const config = require("../config.json");
+import GameObject from "./gameObject";
+import Player from "./player";
+import Networking from "./networking";
+import InputHandler from "./inputHandler";
+import CollisionDetection from "./collisionDetection";
+import AssetLoader from "./assetLoader";
+import Camera from "./camera";
+import UI from "./ui";
+import Map from "./map";
+import Projectile from "./projectile";
 
-module.exports.Game = class Game {
-    constructor() {        
-        this.ctxForeground = {};
-        this.ctxBackground = {};
 
+export default class Game {
+    ctxForeground: CanvasRenderingContext2D | undefined;
+    ctxBackground: CanvasRenderingContext2D | undefined;
+    lastFrameTime: number;
+    gamePaused: boolean;
+    ui: UI;
+    camera: Camera;
+    map: any;
+    objects: GameObject[];
+    character: Player | undefined;
+    onlinePlayer: { [id: string]: Player };
+    networking: Networking | undefined;
+    inputHandler: InputHandler| undefined;
+    collisionDetection: CollisionDetection| undefined;
+    assetLoader: AssetLoader;
+    debugShow: boolean;
+    config: { [key: string]: string };
+
+
+    constructor() {
         this.lastFrameTime = 0;
         this.gamePaused = false;
 
@@ -24,12 +38,8 @@ module.exports.Game = class Game {
 
         this.camera = new Camera();
         this.map = {};
-        this.objects = [];                                  
-        this.character = {};                    
+        this.objects = [];
         this.onlinePlayer = {};
-        this.networking = {};
-        this.inputHandler = {};
-        this.collisionDetection = {};
         this.assetLoader = new AssetLoader();
         this.debugShow = false;
         this.config = config;
@@ -40,7 +50,7 @@ module.exports.Game = class Game {
     };
     
     // start game
-    start(playerName) {
+    start(playerName: string) {
         this.setupCanvas();
 
         this.assetLoader.loadAssets();
@@ -75,7 +85,7 @@ module.exports.Game = class Game {
     }
 
     // main game loop with update and draw method call
-    gameLoop(time) {
+    gameLoop(time: number) {
         let timeSinceLastFrame = (time - this.lastFrameTime)/1000;     //how much time has passed since last drawn frame relative to our standard interval of 16 ms
         this.lastFrameTime = time;
 
@@ -89,7 +99,7 @@ module.exports.Game = class Game {
     }
 
     // wait for everything to load and display loading screen while doing it
-    waitForLoadedAssetsAndStart(playerName) {
+    waitForLoadedAssetsAndStart(playerName: string) {
         if (this.assetLoader.isFinishedLoading() === false) {
             this.ui.drawLoadingScreen();
             requestAnimationFrame(this.waitForLoadedAssetsAndStart.bind(this,playerName));
@@ -103,7 +113,7 @@ module.exports.Game = class Game {
     }
 
     // initialize Gameobject like map, the character, inputhandler, ...
-    initializeGameObjects(playerName) {
+    initializeGameObjects(playerName: string) {
         this.map = new Map(this.assetLoader.mapLayouts["mainLobby"], this.assetLoader.sprites["mainLobby"], 240, 24, 10);
         this.character = new Player(this.assetLoader.sprites["player2"], 100, 100, playerName, this.assetLoader.sprites["ball"]);
 
@@ -137,14 +147,14 @@ module.exports.Game = class Game {
         this.character.draw(this.ctxForeground);                                                 
         
         if(this.debugShow === true){
-            for (var i = 0; i < this.collisionDetection.colliders.length; i++) {
+            for (let i = 0; i < this.collisionDetection.colliders.length; i++) {
                 let object = this.collisionDetection.colliders[i];
                 object.drawDebug(this.ctxForeground);
             }
             this.character.drawDebug(this.ctxForeground);
         }
 
-        for (var playerId in this.onlinePlayer) {
+        for (let playerId in this.onlinePlayer) {
             if (this.onlinePlayer.hasOwnProperty(playerId)) {
                 this.onlinePlayer[playerId].draw(this.ctxForeground)
             }
@@ -154,7 +164,7 @@ module.exports.Game = class Game {
     };
 
     // update the positions of all objects
-    update(timePassed) {
+    update(timePassed: number) {
         this.inputHandler.handleInput(timePassed);                                                      
         let inputStateForServer = this.inputHandler.prepareAndReturnInputStateForServer();              
         this.networking.sendInput(inputStateForServer);
@@ -163,7 +173,7 @@ module.exports.Game = class Game {
             let object = this.objects[i];
             
             if (object instanceof Projectile) {
-                object.checkforDeletion(this.networking.clientTime);
+                object.checkForDeletion(this.networking.clientTime);
             }
             if (this.objects[i].toBeDeleted === true){
                 this.objects.splice(i,1);

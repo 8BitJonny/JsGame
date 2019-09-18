@@ -1,11 +1,25 @@
-module.exports.SpriteInterpreter = class SpriteInterpreter {
+export default class SpriteInterpreter {
+    image: any;
+    scale: number;
+    currentShapeIndex: number;
+    startShapeIndex: number;
+    endShapeIndex: number;
+    shapesX: number;
+    shapesY: number;
+    paddingX: number;
+    paddingY: number;
+    speed: number;
+    shapeWidth: number;
+    shapeHeight: number;
+    nextFrameTime: number;
+
     constructor(
-       image,
-       scale,
-       startShapeIndex,
-       shapeCount,
-       shapesX,
-       shapesY,
+       image: CanvasImageSource,
+       scale: number,
+       startShapeIndex: number,
+       shapeCount: number,
+       shapesX: number,
+       shapesY: number,
        paddingX = 0,
        paddingY = 0,
        speed = 0 
@@ -26,15 +40,17 @@ module.exports.SpriteInterpreter = class SpriteInterpreter {
        this.nextFrameTime = new Date().getTime();
     };
     
-    draw(ctx) {
+    draw(ctx: CanvasRenderingContext2D) {
         let currentTime = new Date().getTime();
         if(this.speed > 0 && currentTime > this.nextFrameTime){
             this.currentShapeIndex ++;
             this.nextFrameTime = currentTime + (1000/this.speed);
-        };
+        }
+
         if(this.currentShapeIndex > this.endShapeIndex){
             this.currentShapeIndex = this.startShapeIndex;
-        };
+        }
+
         let posX = (this.currentShapeIndex % this.shapesX) * this.shapeWidth + (this.currentShapeIndex % this.shapesX) * this.paddingX;
         let posY = Math.floor(this.currentShapeIndex / this.shapesX) * this.shapeHeight + Math.floor(this.currentShapeIndex / this.shapesX) * this.paddingY;
 

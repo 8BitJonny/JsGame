@@ -1,20 +1,20 @@
-const { Vector } = require("./vector");
+import Vector from "./vector";
 
 // Math round to n digits after the comma
-function fix (int,n) {
+function fix (int: number,n?: number) {
     n = n || 3;
     return parseFloat(int.toFixed(n));
 }
 
 // Basic linear Interpolation, explained https://www.youtube.com/watch?v=HL8JbLDsFxY
-function lerp (base, target, t) {
+function lerp (base: number, target: number, t: number) {
     t = Math.min(1, t);
     t = Math.max(0, t);
     return base + t * (target - base)
 }
 
 // linear Interpolation for a 2D vector
-function v_lerp(baseVector, targetVector, time) {
+function v_lerp(baseVector: Vector, targetVector: Vector, time: number) {
 
     return new Vector(
         lerp(baseVector.x, targetVector.x, time),
@@ -22,23 +22,23 @@ function v_lerp(baseVector, targetVector, time) {
     );
 }
 
-function isFunction(functionToCheck) {
+function isFunction(functionToCheck: () => any) {
     return functionToCheck && {}.toString.call(functionToCheck) === '[object Function]';
 }
 
-function makeId(length) {
-    var result           = '';
-    var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    var charactersLength = characters.length;
-    for ( var i = 0; i < length; i++ ) {
+function makeId(length: number) {
+    let result           = '';
+    const characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const charactersLength = characters.length;
+    for ( let i = 0; i < length; i++ ) {
         result += characters.charAt(Math.floor(Math.random() * charactersLength));
     }
     return result;
 }
 
-module.exports = {
-    fix: fix,
-    v_lerp: v_lerp,
-    makeId: makeId,
-    isFunction: isFunction
+export {
+    fix,
+    v_lerp,
+    makeId,
+    isFunction
 };

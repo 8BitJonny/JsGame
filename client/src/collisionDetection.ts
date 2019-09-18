@@ -1,17 +1,18 @@
-const { GameObject } = require("./gameObject");
+import GameObject  from "./gameObject";
+import Vector from "./vector";
 
-module.exports.CollisionDetection = class CollisionDetection {
-    constructor(colliders) {
+export default class CollisionDetection {
+    colliders: GameObject[];
+
+    constructor(colliders: GameObject[]) {
         this.colliders = colliders;
     };
 
-    addCollidier(obj) {
-        if (obj instanceof GameObject) {
-            this.colliders.push(obj);
-        }
+    addCollidier(obj: GameObject) {
+        this.colliders.push(obj);
     };
 
-    isColliding(position, hitBox) {
+    isColliding(position: Vector, hitBox: { width: number, height: number }) {
         let isColliding = false;
         this.colliders.forEach(collider => {
             if (position.x <= collider.position.x + collider.hitBox.width

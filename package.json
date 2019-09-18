@@ -22,5 +22,9 @@
   "homepage": "https://github.com/8BitJonny/JsGame#readme",
   "dependencies": {
     "concurrently": "^4.1.1"
+  },
+  "devDependencies": {
+    "ts-loader": "^6.1.0",
+    "typescript": "^3.6.3"
   }
 }

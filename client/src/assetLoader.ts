@@ -1,4 +1,9 @@
-module.exports.AssetLoader = class AssetLoader {
+export default class AssetLoader {
+    imagesToBeLoaded: number;
+    startedLoading: boolean;
+    sprites: { [id: string] : HTMLImageElement };
+    mapLayouts: { [id: string] : JSON };
+
     constructor() {
         this.imagesToBeLoaded = 0;
         this.startedLoading = false;
@@ -32,7 +37,7 @@ module.exports.AssetLoader = class AssetLoader {
         return this.imagesToBeLoaded <= 0 && this.startedLoading;
     };
 
-    _imageForPath(path) {
+    _imageForPath(path: string): HTMLImageElement {
         let newImage = new Image();
         newImage.src = path;
         newImage.addEventListener('load', _ => {                                                    

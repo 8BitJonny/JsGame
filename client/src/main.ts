@@ -18,7 +18,7 @@ switch(window.location.pathname) {
             setInHouseRoutingToken();
 
             let startScreen = document.getElementById("startScreen");
-            let playerName = document.getElementById("playerName").value;
+            let playerName = (document.getElementById("playerName") as HTMLInputElement).value;
 
             // if name is null or empty
             if (!playerName||!playerName.trim()) {
@@ -47,16 +47,16 @@ switch(window.location.pathname) {
     case "/game":
     case "/game.html":
         validateInHouseRoutingToken();
-        const playername = readLocalStorage("playername");
+        const playerName = readLocalStorage("playername");
 
         let game = new Game();
-        game.start(playername);
+        game.start(playerName);
         break;
     default:
        // page not found
 }
 
-function readLocalStorage(key) {
+function readLocalStorage(key: string) {
     if (typeof(Storage) !== "undefined") {
         return localStorage.getItem(key)
     } else {
@@ -64,7 +64,7 @@ function readLocalStorage(key) {
     }
 }
 
-function setLocalStorage(key,value) {
+function setLocalStorage(key: string, value: any) {
     if (typeof(Storage) !== "undefined") {
         localStorage.setItem(key, value)
     } else {

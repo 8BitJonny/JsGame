@@ -1,8 +1,15 @@
-const { GameObject } = require("./gameObject.js");
-const { SpriteInterpreter } = require("./spriteInterpreter.js");
+import SpriteInterpreter from "./spriteInterpreter";
+import Vector from "./vector";
+import GameObject from "./gameObject";
 
-module.exports.Projectile = class Projectile extends GameObject{
-    constructor(position, baseVelocity, timeOfCreation, sprite, objects, owner) {
+export default class Projectile extends GameObject{
+    PROJECTILESPEED: number;
+    LIFESPAN: number;
+    objects: GameObject[];
+    timeOfCreation: number;
+    baseVelocity: Vector;
+
+    constructor(position: Vector, baseVelocity: Vector, timeOfCreation: number, sprite: CanvasImageSource, objects: GameObject[], owner: string) {
         let projectileStartX = position.x;
         let projectileStartY = position.y;
 
@@ -16,10 +23,10 @@ module.exports.Projectile = class Projectile extends GameObject{
         this.baseVelocity = baseVelocity;
     }
 
-    update(timePassed) {
+    update(timePassed: number) {
         this.calculateTimeBasedVelocity(timePassed);
 
-        super.update();
+        super.update(timePassed);
     }
 
     spawn() {
@@ -40,7 +47,7 @@ module.exports.Projectile = class Projectile extends GameObject{
         }
     }
 
-    checkforDeletion(clientTime) {
+    checkForDeletion(clientTime: number) {
         if (clientTime > this.timeOfCreation + this.LIFESPAN){
             this.toBeDeleted = true;
         }

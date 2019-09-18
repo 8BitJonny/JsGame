@@ -1,8 +1,20 @@
-const { makeId } = require("./utils");
-const { Vector } = require("./vector");
+import { makeId } from "./utils";
+import Vector from "./vector";
+import SpriteInterpreter from "./spriteInterpreter";
 
-module.exports.GameObject = class GameObject {
-    constructor(id, spriteInterpreter, x, y, type, owner) {
+export default class GameObject {
+    type: string;
+    id: string;
+    owner: string;
+    spriteInterpreter: SpriteInterpreter;
+    position: Vector;
+    velocity: Vector;
+    timeBasedVelocity: Vector;
+    toBeDeleted: boolean;
+    hitBox: { width: number, height: number };
+    children: GameObject[];
+
+    constructor(id: string, spriteInterpreter: SpriteInterpreter, x: number, y: number, type: string, owner: string) {
         this.type = type;
         this.id = id != null ? id : makeId(5);
         this.owner = owner; // the player who create this object
@@ -25,7 +37,7 @@ module.exports.GameObject = class GameObject {
         this.children = []
     };
 
-    draw(ctx) {                                                                             
+    draw(ctx: CanvasRenderingContext2D) {
         ctx.save();
         ctx.translate(this.position.x, this.position.y);
 
@@ -40,29 +52,27 @@ module.exports.GameObject = class GameObject {
         ctx.restore();
     };
     
-    update() {
+    update(timePassed: number) {
         // the velocity represent the speed in pixels per second.
         this.position = this.position.add(this.timeBasedVelocity);
     };
 
-    calculateTimeBasedVelocity(timePassed) {
+    calculateTimeBasedVelocity(timePassed: number) {
         this.timeBasedVelocity = this.velocity.mul_scalar(timePassed)
     }
     
-    drawDebug(ctx) {
+    drawDebug(ctx: CanvasRenderingContext2D) {
         ctx.strokeStyle = "red";
         ctx.strokeRect(this.position.x,this.position.y,this.hitBox.width,this.hitBox.height);
     };
 
-    addChildren(obj) {
-        if (obj instanceof GameObject) {
-            this.children.push(obj);
-        }
+    addChildren(obj: GameObject) {
+        this.children.push(obj);
     }
 
     // This function returns a small an compact object describing the player state
     // It is only used by the server, NOT by the client.
-    returnNetworkData() {
+    returnNetworkData(): object {
         return {
             id: this.id,
             t: this.type,

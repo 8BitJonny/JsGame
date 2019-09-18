@@ -1,12 +1,26 @@
-const { GameObject } = require("./gameObject");
-const { TextDrawer } = require("./textDrawer");
-const { SpriteInterpreter } = require("./spriteInterpreter");
-const { Vector } = require("./vector");
-const { CollisionDetection } = require("./collisionDetection");
-const { Projectile } = require("./projectile.js");
+import GameObject from "./gameObject";
+import TextDrawer from "./textDrawer";
+import SpriteInterpreter from "./spriteInterpreter";
+import Vector from "./vector";
+import CollisionDetection from "./collisionDetection";
+import Projectile from "./projectile";
+import { InputState } from "./inputHandler";
 
-module.exports.Player = class Player extends GameObject {
-    constructor(imgSprite,x,y,playerName,projectileSprite){
+export default class Player extends GameObject {
+    SCALE: number;
+    MAXSPEED: number;
+    id: string;
+    playerName: string;
+    facingDirection: number;
+    spriteInterpreterList: SpriteInterpreter[];
+    projectileSprite: CanvasImageSource;
+    collisionDetection?: CollisionDetection;
+    lastInputID: number;
+    inputHistory: InputState[];
+    PROJECTILE_CD: number;
+    lastProjectile: number;
+
+    constructor(imgSprite: CanvasImageSource, x: number, y: number, playerName: string, projectileSprite: CanvasImageSource){
         let PADDINGX = 42;
         let PADDINGY = 10;
         let SCALE = 1;
@@ -41,7 +55,7 @@ module.exports.Player = class Player extends GameObject {
         this.lastProjectile = 0;
     };
 
-    update() {
+    update(timePassed: number) {
         if (this.collisionDetection != null) {
             //check for Collision before updating position
             let oldPosition = this.position.copy();
@@ -70,10 +84,10 @@ module.exports.Player = class Player extends GameObject {
             //reset the hitbox and the position because through object reference the position variable changed too
             this.position = oldPosition.copy();
         }
-        super.update();
+        super.update(timePassed);
     };
 
-    handleInput(gameObjectList) {
+    handleInput(gameObjectList: GameObject[]) {
         if (!this.inputHistory.length) {
             // No Inputs to process
             this.velocity = new Vector(0, 0);
@@ -135,7 +149,7 @@ module.exports.Player = class Player extends GameObject {
         this.timeBasedVelocity = this.velocity.copy();
     }
 
-    updateFacingDirection(newVelocity, oldFacingDirection) {
+    updateFacingDirection(newVelocity: Vector, oldFacingDirection: number) {
         // Figure out the facing Direction
         if (newVelocity.x === 0 && newVelocity.y === 0) {
             this.facingDirection = 0;
@@ -164,7 +178,7 @@ module.exports.Player = class Player extends GameObject {
         }
     }
 
-    shootProjectile(timeOfCreation, sprite, objects) {
+    shootProjectile(timeOfCreation: number, sprite: CanvasImageSource, objects: GameObject[]) {
         let projectile = new Projectile(this.position.add(new Vector(20,10)), this.velocity, timeOfCreation, sprite, objects, this.id);
         projectile.spawn();
     };
@@ -175,15 +189,13 @@ module.exports.Player = class Player extends GameObject {
         this.spriteInterpreter = this.spriteInterpreterList[0];
     };
 
-    setCollisionDetectionObject(object) {
-        if (object instanceof CollisionDetection) {
-            this.collisionDetection = object;
-        }
+    setCollisionDetectionObject(object: CollisionDetection) {
+        this.collisionDetection = object;
     };
 
     // This function returns a small an compact object describing the player state
     // It is only used by the server, NOT by the client.
-    returnNetworkData() {
+    returnNetworkData(): object {
         return {
             p: {                        // Send the position
                 x: this.position.x,

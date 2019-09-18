@@ -1,12 +1,14 @@
-const { GameObject } = require("./gameObject");
+import GameObject from "./gameObject"
 
-module.exports.TextDrawer = class TextDrawer extends GameObject {
-    constructor(text, x, y) {
+export default class TextDrawer extends GameObject {
+    text: string;
+
+    constructor(text: string, x: number, y: number) {
         super(null, null, x, y, null, null);
         this.text = text
     };
 
-    draw(ctx) {
+    draw(ctx: CanvasRenderingContext2D) {
         ctx.save();
         ctx.translate(this.position.x, this.position.y);
 
@@ -21,7 +23,7 @@ module.exports.TextDrawer = class TextDrawer extends GameObject {
 
     };
 
-    drawDebug(ctx) {
+    drawDebug(ctx: CanvasRenderingContext2D) {
 
     };
 };

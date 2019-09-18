@@ -1,10 +1,16 @@
-const { SpriteInterpreter } = require("./spriteInterpreter");
-const { GameObject } = require("./gameObject");
+import SpriteInterpreter from "./spriteInterpreter";
+import GameObject from "./gameObject";
 
-module.exports.Map = class Map {
-    constructor(mapJson, mapImage, totalShapeCount, shapesInRow, shapesInColumn){
+export default class Map {
+    SCALE: number;
+    spriteInterpreter?: SpriteInterpreter;
+    backgroundLayers: any[];
+    foregroundLayers: any[];
+    colliders: GameObject[];
+
+    constructor(mapJson: JSON, mapImage: CanvasImageSource, totalShapeCount: number, shapesInRow: number, shapesInColumn: number){
         this.SCALE = 4;
-        this.spriteinterpreter = mapImage != null ? new SpriteInterpreter(
+        this.spriteInterpreter = mapImage != null ? new SpriteInterpreter(
             mapImage,
             this.SCALE,
             0,
@@ -19,42 +25,42 @@ module.exports.Map = class Map {
         this.readMapData(mapJson);
     };
 
-    drawBackground(ctx) {
+    drawBackground(ctx: CanvasRenderingContext2D) {
         this.draw(ctx, this.backgroundLayers);
     };
 
-    drawForeground(ctx) {
+    drawForeground(ctx: CanvasRenderingContext2D) {
         this.draw(ctx, this.foregroundLayers);
     };
 
-    draw(ctx, tileLayers) {
-        if (this.spriteinterpreter === null) {
+    draw(ctx: CanvasRenderingContext2D, tileLayers: any[]) {
+        if (this.spriteInterpreter === null) {
             return
         }
 
         tileLayers.forEach(layer =>{
             let x = 0;
             let y = 0;
-            layer.data.forEach((value, index) => {
-                this.spriteinterpreter.currentShapeIndex = value - 1;
+            layer.data.forEach((value: number, index: number) => {
+                this.spriteInterpreter.currentShapeIndex = value - 1;
 
                 x = index % layer.width;
                 y = Math.floor(index / layer.width);
                 
                 ctx.save();
                 ctx.translate(
-                    x * this.spriteinterpreter.shapeWidth * this.SCALE,
-                    y * this.spriteinterpreter.shapeHeight * this.SCALE
+                    x * this.spriteInterpreter.shapeWidth * this.SCALE,
+                    y * this.spriteInterpreter.shapeHeight * this.SCALE
                 );
                 
-                this.spriteinterpreter.draw(ctx);
+                this.spriteInterpreter.draw(ctx);
                 ctx.restore();
             });
         });
     };
 
-    readMapData(json) {
-        json.layers.forEach(layer =>{
+    readMapData(json: any) {
+        json.layers.forEach((layer: any) =>{
             switch(layer.type) {
                 case "tilelayer":
                     switch (layer.name) {
@@ -67,7 +73,7 @@ module.exports.Map = class Map {
                     }
                     break;
                 case "objectgroup":
-                    layer.objects.forEach(object => {
+                    layer.objects.forEach((object: any) => {
                         let newCollider = new GameObject(null, null, object.x * this.SCALE, object.y * this.SCALE, null, null);
                         newCollider.hitBox = {
                             width: object.width * this.SCALE, 

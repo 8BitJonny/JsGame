@@ -1,9 +1,16 @@
-const { isFunction } = require("./utils");
+import { isFunction } from "./utils";
 
-module.exports.UI = class UI {
+export default class UI {
+    cfg: HTMLCanvasElement;
+    cbg: HTMLCanvasElement;
+
+    onGameStart: () => void;
+    onGameResume: () => void;
+    onGameExit: () => void;
+
     constructor() {
-        this.cfg = document.getElementById("foreground");   //cfg = canvas foreground
-        this.cbg = document.getElementById("background");   //cbg = canvas background
+        this.cfg = document.getElementById("foreground") as HTMLCanvasElement;   //cfg = canvas foreground
+        this.cbg = document.getElementById("background") as HTMLCanvasElement;   //cbg = canvas background
 
         // Event Handler
         this.onGameStart = null;
@@ -11,7 +18,7 @@ module.exports.UI = class UI {
         this.onGameExit = null;
     }
 
-    addWindowEventListener(onPauseCallback) {
+    addWindowEventListener(onPauseCallback: () => void) {
         this.resizeCanvas();
 
         window.addEventListener("resize", () => {
@@ -19,14 +26,14 @@ module.exports.UI = class UI {
         });
 
         // Set the name of the hidden property and the change event for visibility
-        let hidden, visibilityChange;
+        let hidden: string, visibilityChange: string;
         if (typeof document.hidden !== "undefined") { // Opera 12.10 and Firefox 18 and later support
             hidden = "hidden";
             visibilityChange = "visibilitychange";
-        } else if (typeof document.msHidden !== "undefined") {
+        } else if (typeof (document as any).msHidden !== "undefined") {
             hidden = "msHidden";
             visibilityChange = "msvisibilitychange";
-        } else if (typeof document.webkitHidden !== "undefined") {
+        } else if (typeof (document as any).webkitHidden !== "undefined") {
             hidden = "webkitHidden";
             visibilityChange = "webkitvisibilitychange";
         }
@@ -34,7 +41,7 @@ module.exports.UI = class UI {
         // If the page is hidden, pause the video;
         // if the page is shown, play the video
         function handleVisibilityChange() {
-            if (document[hidden]) {
+            if (document.hidden) {
                 onPauseCallback()
             }
         }
@@ -86,7 +93,7 @@ module.exports.UI = class UI {
         pauseHtml.style.display = "none";
     }
 
-    displayVersions(clientVersion, serverVersion) {
+    displayVersions(clientVersion: string, serverVersion: string) {
         let clientVersionHtml = document.getElementById("clientVersion");
         let serverVersionHtml = document.getElementById("serverVersion");
 

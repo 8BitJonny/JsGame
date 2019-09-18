@@ -4,7 +4,8 @@ const HtmlBeautifyPlugin = require('html-beautify-webpack-plugin');
 
 module.exports = {
     mode: 'development',
-    entry: './src/main.js',
+    entry: './src/main.ts',
+    devtool: 'inline-source-map',
     output: {
         path: path.resolve(__dirname, 'dist'),
         filename: 'bundle.js'
@@ -16,6 +17,11 @@ module.exports = {
     },
     module: {
         rules: [
+	    {
+		test: /\.tsx?$/,
+		use: 'ts-loader',
+		exclude: /node_modules/
+	    },
             {
                 test: /\.(png|jp(e*)g|svg)$/,
                 use: [{
@@ -37,6 +43,9 @@ module.exports = {
                 ]
             }
         ]
+    },
+    resolve: {
+	extensions: [ '.tsx', '.ts', '.js']
     },
     plugins: [
         new HtmlWebpackPlugin({

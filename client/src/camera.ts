@@ -1,19 +1,20 @@
-const { Vector }  = require("./vector");
-const { GameObject } = require("./gameObject");
+import Vector from "./vector";
+import GameObject from "./gameObject";
 
-module.exports.Camera = class Camera {
+export default class Camera {
+    position: Vector;
+    frameCount: number;
+
     constructor() {
         this.position = new Vector(0, 0);
         this.frameCount = 1;
      };
 
-    getLocalPosition(gameObject) {
-        if(gameObject instanceof GameObject){
-            return gameObject.position.add(this.position);
-        };
+    getLocalPosition(gameObject: GameObject) {
+        return gameObject.position.add(this.position);
     };
 
-    moveToKeepObjectFocused(gameObject) {
+    moveToKeepObjectFocused(gameObject: GameObject) {
         let localPosition = this.getLocalPosition(gameObject);
         this.frameCount = this.frameCount === 1 ? 2 : 1;
 
@@ -22,31 +23,31 @@ module.exports.Camera = class Camera {
                 this.position.x += 1;    
             } else {
                 this.position.x += 2;
-            };
-        };
+            }
+        }
 
         if (localPosition.x > window.innerWidth * 0.75){
             if (this.frameCount === 1) {
                 this.position.x -= 1;
             } else {
                 this.position.x -= 2;
-            };
-        };
+            }
+        }
         
         if (localPosition.y < window.innerHeight * 0.25){
             if(this.frameCount === 1) {
                 this.position.y += 1;
             } else {
                 this.position.y += 2;
-            };
-        };
+            }
+        }
         
         if (localPosition.y > window.innerHeight * 0.75){    
             if (this.frameCount === 1) {
                 this.position.y -= 1; 
             } else {
                 this.position.y -= 2;
-            };
-        };    
+            }
+        }
     };
 };

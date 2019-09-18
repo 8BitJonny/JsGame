@@ -1,11 +1,26 @@
-const { Player } = require("./player");
-const { Projectile } = require("./projectile");
-const { SpriteInterpreter } = require("./spriteInterpreter");
-const { Vector } = require("./vector");
-const { fix, v_lerp } = require("./utils");
+import Player from "./player";
+import Game from "./game"
+import Projectile from "./projectile";
+import Vector from "./vector";
+import { fix, v_lerp } from "./utils";
+import GameObject from "./gameObject";
 
-module.exports.Networking = class Networking {
-    constructor(ip,game) {
+export default class Networking {
+	socket: any;
+	game: Game;
+	networkStatus: HTMLElement;
+	pingHtml: HTMLElement;
+	BUFFERSIZE: number;
+	NET_OFFSET: number;
+	serverTime: number;
+	clientTime: number;
+	_deltaTime: number;
+	_lastTimeStamp: number;
+	last_ping_time: number;
+	lastSendSID: number;
+	serverUpdates: any[];
+
+    constructor(ip: string, game: Game) {
         this.socket = io.connect(ip);
         this.game = game;
 
@@ -49,7 +64,7 @@ module.exports.Networking = class Networking {
     }
 
     // Sends the received input from the player and the StateIndex to the server e.g. which keys he pressed to move or to do an action
-    sendInput(inputState) {
+    sendInput(inputState: any) {
         this.lastSendSID = inputState.stateIndex;
         this.socket.emit("i", { k: inputState.keysDown, si: inputState.stateIndex, td: inputState.timeDelta, t: inputState.time});
     }
@@ -157,12 +172,12 @@ module.exports.Networking = class Networking {
 
                 // ... Delete old Projectile Objects
                 let serverPlayer = target.p[playerId];
-                let indexOfApprovedState = this.game.inputHandler.inputHistory.map( inputItem => inputItem.stateIndex ).indexOf(serverPlayer.si);
+                let indexOfApprovedState = this.game.inputHandler.inputHistory.map((inputItem: { stateIndex: any; }) => inputItem.stateIndex ).indexOf(serverPlayer.si);
                 if (indexOfApprovedState !== -1 || serverPlayer.si > this.game.inputHandler.inputHistory[0].stateIndex) {
                     let clientTimeOfApprovedStateTime = this.game.inputHandler.inputHistory[indexOfApprovedState].time;
 
 
-                    this.game.objects = this.game.objects.filter(object => {
+                    this.game.objects = this.game.objects.filter((object: GameObject) => {
                         if (object instanceof Projectile) {
                             // If it is an Projectile delete it if it's timeOfCreation is before the Time the Server approved
                             // Because if the ApprovedServerTime is bigger, we now got the real projectile from the server and delete our temporary one without id
@@ -207,13 +222,13 @@ module.exports.Networking = class Networking {
         for (let index in target.o) {
             const targetObjectState = target.o[index];
 
-            let localObject = this.game.objects.filter(object => object.id === targetObjectState.id)[0];
+            let localObject = this.game.objects.filter((object: GameObject) => object.id === targetObjectState.id)[0];
             if (targetObjectState.pid === this.socket.userid) {
                 // This is an object which we created in the first place and already have
                 // We skip it
             } else if (localObject !== undefined) {
                 // The online object already exists in our game and we just need to update it
-                let baseObjectState = previous.o.filter(object => object.id === targetObjectState.id)[0];
+                let baseObjectState = previous.o.filter((object: GameObject) => object.id === targetObjectState.id)[0];
                 if (baseObjectState === undefined) {
                     // We don't have any previous data points for this object
                     continue
@@ -226,7 +241,7 @@ module.exports.Networking = class Networking {
                 switch(targetObjectState.t) {
                     case "projectile":
                         const sprite = this.game.assetLoader.sprites["ball"];
-                        const projectile = new Projectile(targetObjectState.p, new Vector(0,0), targetObjectState.to, sprite, null);
+                        const projectile = new Projectile(targetObjectState.p, new Vector(0,0), targetObjectState.to, sprite, null, null);
                         projectile.id = targetObjectState.id;
                         this.game.objects.push(projectile);
                         break;
@@ -241,12 +256,12 @@ module.exports.Networking = class Networking {
     //////////////////////////////////////////
     // *--   Connection Event Handler   --* //
 
-    onConnect(payload) {
+    onConnect(payload: any) {
         // Send initial Data on connection
         this.socket.emit("id", { pn: this.game.character.playerName});
     }
 
-    onServerConnect(payload) {
+    onServerConnect(payload: any) {
         this.socket.userid = payload.id;
         this.game.character.id = payload.id;
         this.game.ui.displayVersions(this.game.config.clientVersion, payload.v);
@@ -259,15 +274,15 @@ module.exports.Networking = class Networking {
              && payload.p.hasOwnProperty(playerId)
              && this.socket.userid !== playerId) {
                 let newPlayer = payload.p[playerId];
-                this.game.onlinePlayer[playerId] = new Player(this.game.assetLoader.sprites["player2"], newPlayer.p.x, newPlayer.p.y, newPlayer.pn)
+                this.game.onlinePlayer[playerId] = new Player(this.game.assetLoader.sprites["player2"], newPlayer.p.x, newPlayer.p.y, newPlayer.pn, null)
             }
         }
     }
 
-    onRoomConnect(payload) {
+    onRoomConnect(payload: any) {
         // here we get notified of the new players initial data like playername
         if (!this.game.onlinePlayer.hasOwnProperty(payload.newPlayer.id)) {
-            this.game.onlinePlayer[payload.newPlayer.id] = new Player(this.game.assetLoader.sprites["player2"], payload.newPlayer.p.x, payload.newPlayer.p.y, payload.newPlayer.pn)
+            this.game.onlinePlayer[payload.newPlayer.id] = new Player(this.game.assetLoader.sprites["player2"], payload.newPlayer.p.x, payload.newPlayer.p.y, payload.newPlayer.pn, null)
         }
     }
 
@@ -275,12 +290,12 @@ module.exports.Networking = class Networking {
         this.networkStatus.innerHTML = "Offline";
     }
 
-    onServerPing(payload) {
+    onServerPing(payload: any) {
         const tof = new Date().getTime() - parseFloat(payload.t);
         this.pingHtml.innerHTML = String(tof / 2);
     }
 
-    onServerState(payload) {
+    onServerState(payload: any) {
         this.serverUpdates.push(payload);
 
         this.serverTime = payload.t;
@@ -333,11 +348,11 @@ module.exports.Networking = class Networking {
 
     // create an accurate time
     create_timer() {
-        setInterval(function(){
+        setInterval(() => {
             this._deltaTime = new Date().getTime() - this._lastTimeStamp;
             this._lastTimeStamp = new Date().getTime();
             this.clientTime += this._deltaTime/1000;
-        }.bind(this), 4);
+        }, 4);
     }
 
     static isValidNetworkObject(obj) {
