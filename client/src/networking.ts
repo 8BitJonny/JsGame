@@ -4,6 +4,7 @@ import Projectile from "./projectile";
 import Vector from "./vector";
 import { fix, v_lerp } from "./utils";
 import GameObject from "./gameObject";
+import * as io from "socket.io-client";
 
 export default class Networking {
 	socket: any;
@@ -208,7 +209,7 @@ export default class Networking {
                 // calculate the position based on the previous calculated percentage
                 onlinePlayer.position = v_lerp(basePlayerState.p, targetPlayerState.p, relativeDistance);
                 // update player
-                onlinePlayer.facing = targetPlayerState.f;
+                onlinePlayer.facingDirection = targetPlayerState.f;
                 onlinePlayer.spriteInterpreter = onlinePlayer.spriteInterpreterList[targetPlayerState.f];
             } else {
                 // This online player recently joined and is not in the onlinePlayer array
@@ -355,7 +356,7 @@ export default class Networking {
         }, 4);
     }
 
-    static isValidNetworkObject(obj) {
+    static isValidNetworkObject(obj: object) {
         return obj.hasOwnProperty("f") && obj.hasOwnProperty("p") && obj.hasOwnProperty("si");
     }
 };
